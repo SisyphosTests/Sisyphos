@@ -1,0 +1,79 @@
+import XCTest
+
+
+public protocol Page {
+    var application: String? { get }
+
+    @PageBuilder var body: PageDescription { get }
+}
+
+public extension Page {
+    var application: String? { nil }
+}
+
+
+extension Page {
+    var xcuiapplication: XCUIApplication {
+        if let application {
+            return XCUIApplication(bundleIdentifier: application)
+        } else {
+            return XCUIApplication()
+        }
+    }
+}
+
+public extension Page {
+    func exists() -> Bool {
+        storeStableElements()
+        return XCTContext.runActivity(named: "Check if page \(String(describing: type(of: self))) exists") { activity in
+            guard let snapshot = try? xcuiapplication.snapshot() else { return false }
+            TestData.isEvaluatingBody = true
+            for element in body.elements {
+                guard element.exists(in: snapshot) else { return false }
+            }
+            TestData.isEvaluatingBody = false
+            return true
+        }
+    }
+
+    func waitForExistence(timeout: CFTimeInterval = 10) {
+        let runLoop = RunLoop.current
+        var iteration: CFTimeInterval = 0
+        repeat {
+            guard !exists() else { return }
+            // TODO: checking the UI also took some time already, so this method actually waits longer than the timeout.
+            //   Refactor to make it respect the timeout.
+            _ = runLoop.run(mode: .default, before: Date(timeIntervalSinceNow: 1))
+            iteration += 1
+        } while iteration < timeout
+        XCTFail() // FIXME good error message
+    }
+}
+
+
+var stableElementsStore: [UUID: String?] = [:]
+
+private extension Page {
+    /// Finds elements which are not recreated with a new ID when body is accessed. This means that the elements are
+    /// stored outside the body and used as variable in the body.
+    func storeStableElements() {
+        let elementsInFirstPass = Set(flattenElements().map { $0.elementIdentifier })
+        let elementsInSecondPass = Set(flattenElements().map { $0.elementIdentifier })
+        for stableElement in elementsInFirstPass.intersection(elementsInSecondPass) {
+            stableElementsStore[stableElement] = application
+        }
+    }
+
+    func flattenElements() -> [PageElement] {
+        body.elements.flatMap { $0.flatten() }
+    }
+}
+
+private extension PageElement {
+    func flatten() -> [PageElement] {
+        if let hasChildren = self as? HasChildren {
+            return [self] + hasChildren.elements.flatMap { $0.flatten() }
+        }
+        return [self]
+    }
+}

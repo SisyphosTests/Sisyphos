@@ -15,6 +15,7 @@ public protocol HasChildren {
 public struct StaticText: PageElement {
     public let elementIdentifier: PageElementIdentifier
 
+    let identifier: String?
     let text: String
 
     public var queryIdentifier: QueryIdentifier {
@@ -22,19 +23,21 @@ public struct StaticText: PageElement {
             elementType: .staticText,
             identifier: nil,
             label: text,
+            value: nil,
             descendants: []
         )
     }
 
     public init(
+        identifier: String? = nil,
         _ text: String,
         file: String = #file,
         line: UInt = #line,
         column: UInt = #column
     ) {
         self.elementIdentifier = .init(file: file, line: line, column: column)
+        self.identifier = identifier
         self.text = text
-
     }
 }
 
@@ -50,6 +53,7 @@ public struct Button: PageElement {
             elementType: .button,
             identifier: identifier,
             label: label,
+            value: nil,
             descendants: []
         )
     }
@@ -79,6 +83,7 @@ public struct NavigationBar: PageElement, HasChildren {
             elementType: .navigationBar,
             identifier: identifier,
             label: nil,
+            value: nil,
             descendants: elements.map { $0.queryIdentifier }
         )
     }
@@ -128,6 +133,7 @@ public struct TabBar: PageElement, HasChildren {
             elementType: .tabBar,
             identifier: nil,
             label: nil,
+            value: nil,
             descendants: elements.map { $0.queryIdentifier }
         )
     }
@@ -159,6 +165,7 @@ public struct CollectionView: PageElement, HasChildren {
             elementType: .collectionView,
             identifier: nil,
             label: nil,
+            value: nil,
             descendants: elements.map { $0.queryIdentifier }
         )
     }
@@ -168,46 +175,56 @@ public struct CollectionView: PageElement, HasChildren {
 public struct Cell: PageElement, HasChildren {
     public let elementIdentifier: PageElementIdentifier
 
+    let identifier: String?
+
     public let elements: [PageElement]
 
-    init(elements: [PageElement]) {
+    init(identifier: String?, elements: [PageElement]) {
         self.elementIdentifier = .dynamic
+        self.identifier = identifier
         self.elements = elements
     }
 
     public init(
+        identifier: String? = nil,
         @PageBuilder elements: () -> PageDescription,
         file: String = #file,
         line: UInt = #line,
         column: UInt = #column
     ) {
         self.elementIdentifier = .init(file: file, line: line, column: column)
+        self.identifier = identifier
         self.elements = elements().elements
     }
 
     public var queryIdentifier: QueryIdentifier {
         .init(
             elementType: .cell,
-            identifier: nil,
+            identifier: identifier,
             label: nil,
+            value: nil,
             descendants: elements.map { $0.queryIdentifier }
         )
     }
 }
 
 
-public struct TextField: PageElement {
+public struct TextField: PageElement, TextInput {
     public let elementIdentifier: PageElementIdentifier
 
     public let identifier: String?
 
+    public let value: String?
+
     public init(
         identifier: String? = nil,
+        value: String? = nil,
         file: String = #file,
         line: UInt = #line,
         column: UInt = #column
     ) {
         self.elementIdentifier = .init(file: file, line: line, column: column)
+        self.value = value
         self.identifier = identifier
     }
 
@@ -216,28 +233,61 @@ public struct TextField: PageElement {
             elementType: .textField,
             identifier: identifier,
             label: nil,
+            value: value,
             descendants: []
         )
     }
 }
 
 
-extension TextField {
+public struct SecureTextField: PageElement, TextInput {
+    public let elementIdentifier: PageElementIdentifier
+
+    public let identifier: String?
+
+    public let value: String?
+
+    public init(
+        identifier: String? = nil,
+        value: String? = nil,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column
+    ) {
+        self.elementIdentifier = .init(file: file, line: line, column: column)
+        self.value = value
+        self.identifier = identifier
+    }
+
+    public var queryIdentifier: QueryIdentifier {
+        .init(
+            elementType: .secureTextField,
+            identifier: identifier,
+            label: nil,
+            value: value,
+            descendants: []
+        )
+    }
+}
+
+
+public protocol TextInput: PageElement {}
+
+extension TextInput {
     public func type(text: String) {
         // TODO: better activity description
         XCTContext.runActivity(named: "Typing text \(text.debugDescription)") { activity in
-            guard let element = getXCUIElement(forAction: "type(text: \(text.debugDescription)") else { return }
-            if !element.hasFocus {
-                element.tap()
-            }
+            guard let element = getXCUIElementQuery(forAction: "type(text: \(text.debugDescription)")?.element else { return }
+            element.tap()
             element.typeText(text)
         }
     }
 }
 
+
 extension PageElement {
 
-    func getXCUIElement(forAction action: String) -> XCUIElement? {
+    func getXCUIElementQuery(forAction action: String) -> XCUIElementQuery? {
         guard let cacheEntry = elementCache[elementIdentifier] else {
             assertionFailure("\(action) called before page.exists()!")
             return nil
@@ -256,11 +306,16 @@ extension PageElement {
             query = query.query(queryIdentifier: nextPathComponent)
         }
 
-        return query.element
+        return query
     }
 
     public func tap() {
-        guard let element = getXCUIElement(forAction: "tap()") else { return }
+        guard let element = getXCUIElementQuery(forAction: "tap()")?.element else { return }
+        element.tap()
+    }
+
+    public func tapAny() {
+        guard let element = getXCUIElementQuery(forAction: "tap()")?.firstMatch else { return }
         element.tap()
     }
 }
@@ -284,6 +339,8 @@ extension XCUIElementTypeQueryProvider {
             usedQuery = textFields
         case .navigationBar:
             usedQuery = navigationBars
+        case .secureTextField:
+            usedQuery = secureTextFields
         default:
             fatalError()
         }
@@ -300,6 +357,9 @@ extension XCUIElementTypeQueryProvider {
             }
             if let label = queryIdentifier.label {
                 guard snapshot.matches(searchedLabel: label) else { return false }
+            }
+            if let searchedValue = queryIdentifier.value, let value = snapshot.value {
+                guard value as? String == searchedValue else { return false }
             }
             for descendant in queryIdentifier.descendants {
                 guard !snapshot.find(queryIdentifier: descendant).isEmpty else { return false}
@@ -362,11 +422,21 @@ private extension XCUIElementSnapshot {
             if let label = queryIdentifier.label {
                 guard element.matches(searchedLabel: label) else { return false }
             }
+            if let searchedValue = queryIdentifier.value, let value {
+                guard value as? String == searchedValue else { return false }
+            }
             for descendant in queryIdentifier.descendants {
                 guard find(queryIdentifier: descendant).isEmpty == false else { return false }
             }
             return true
         }
+    }
+}
+
+
+extension PageElement {
+    var declaration: String {
+        "\(elementIdentifier.file) line \(elementIdentifier.line), column \(elementIdentifier.column)"
     }
 }
 

@@ -19,9 +19,15 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
             elements: element.children.flatMap(flatten(element:))
         )
     case .staticText:
-        return StaticText(element.label)
+        return StaticText(
+            identifier: element.identifier,
+            element.label
+        )
     case .button:
-        return Button(label: element.label)
+        return Button(
+            identifier: element.identifier,
+            label: element.label
+        )
     case .tabBar:
         return TabBar(
             elements: element.children.flatMap(flatten(element:))
@@ -32,11 +38,18 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
         )
     case .cell:
         return Cell(
+            identifier: element.identifier,
             elements: element.children.flatMap(flatten(element:))
         )
     case .textField:
         return TextField(
-            identifier: element.identifier
+            identifier: element.identifier,
+            value: element.value as? String
+        )
+    case .secureTextField:
+        return TextField(
+            identifier: element.identifier,
+            value: element.value as? String
         )
     default:
         return nil

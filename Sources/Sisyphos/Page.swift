@@ -24,7 +24,7 @@ extension Page {
 
 public extension Page {
     func exists() -> Bool {
-        storeStableElements()
+        buildPathCache()
         return XCTContext.runActivity(named: "Check if page \(String(describing: type(of: self))) exists") { activity in
             guard let snapshot = try? xcuiapplication.snapshot() else { return false }
             TestData.isEvaluatingBody = true
@@ -48,32 +48,30 @@ public extension Page {
         } while iteration < timeout
         XCTFail() // FIXME good error message
     }
-}
 
+    private func buildPathCache() {
+        func walk(element: PageElement, alreadyWalkedPathToElement: [QueryIdentifier]) {
+            let pathOfElement = alreadyWalkedPathToElement + [element.queryIdentifier]
+            elementCache[element.elementIdentifier] = CacheEntry(
+                application: application,
+                path: pathOfElement
+            )
 
-var stableElementsStore: [UUID: String?] = [:]
+            guard let hasChildren = element as? HasChildren else { return }
+            for child in hasChildren.elements {
+                walk(element: child, alreadyWalkedPathToElement: pathOfElement)
+            }
+        }
 
-private extension Page {
-    /// Finds elements which are not recreated with a new ID when body is accessed. This means that the elements are
-    /// stored outside the body and used as variable in the body.
-    func storeStableElements() {
-        let elementsInFirstPass = Set(flattenElements().map { $0.elementIdentifier })
-        let elementsInSecondPass = Set(flattenElements().map { $0.elementIdentifier })
-        for stableElement in elementsInFirstPass.intersection(elementsInSecondPass) {
-            stableElementsStore[stableElement] = application
+        for element in body.elements {
+            walk(element: element, alreadyWalkedPathToElement: [])
         }
     }
-
-    func flattenElements() -> [PageElement] {
-        body.elements.flatMap { $0.flatten() }
-    }
 }
 
-private extension PageElement {
-    func flatten() -> [PageElement] {
-        if let hasChildren = self as? HasChildren {
-            return [self] + hasChildren.elements.flatMap { $0.flatten() }
-        }
-        return [self]
-    }
+var elementCache: [PageElementIdentifier: CacheEntry] = [:]
+
+struct CacheEntry {
+    let application: String?
+    let path: [QueryIdentifier]
 }

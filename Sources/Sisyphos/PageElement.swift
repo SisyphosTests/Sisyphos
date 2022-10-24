@@ -2,7 +2,7 @@ import XCTest
 
 
 public protocol PageElement {
-    var elementIdentifier: UUID { get }
+    var elementIdentifier: PageElementIdentifier { get }
 
     var queryIdentifier: QueryIdentifier { get }
 }
@@ -13,7 +13,7 @@ public protocol HasChildren {
 
 
 public struct StaticText: PageElement {
-    public let elementIdentifier = UUID()
+    public let elementIdentifier: PageElementIdentifier
 
     let text: String
 
@@ -26,14 +26,21 @@ public struct StaticText: PageElement {
         )
     }
 
-    public init(_ text: String) {
+    public init(
+        _ text: String,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column
+    ) {
+        self.elementIdentifier = .init(file: file, line: line, column: column)
         self.text = text
+
     }
 }
 
 
 public struct Button: PageElement {
-    public let elementIdentifier = UUID()
+    public let elementIdentifier: PageElementIdentifier
 
     let label: String?
     let identifier: String?
@@ -47,7 +54,14 @@ public struct Button: PageElement {
         )
     }
 
-    public init(label: String? = nil, identifier: String? = nil) {
+    public init(
+        label: String? = nil,
+        identifier: String? = nil,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column
+    ) {
+        self.elementIdentifier = .init(file: file, line: line, column: column)
         self.label = label
         self.identifier = identifier
     }
@@ -55,9 +69,9 @@ public struct Button: PageElement {
 
 
 public struct NavigationBar: PageElement, HasChildren {
-    public let elementIdentifier = UUID()
+    public let elementIdentifier: PageElementIdentifier
 
-    let identifier: String
+    let identifier: String?
     public let elements: [PageElement]
 
     public var queryIdentifier: QueryIdentifier {
@@ -70,11 +84,19 @@ public struct NavigationBar: PageElement, HasChildren {
     }
 
     init(identifier: String, elements: [PageElement]) {
+        self.elementIdentifier = .dynamic
         self.identifier = identifier
         self.elements = elements
     }
 
-    public init(identifier: String, @PageBuilder pageDescription: () -> PageDescription) {
+    public init(
+        identifier: String? = nil,
+        @PageBuilder pageDescription: () -> PageDescription,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column
+    ) {
+        self.elementIdentifier = .init(file: file, line: line, column: column)
         self.identifier = identifier
         self.elements = pageDescription().elements
     }
@@ -82,15 +104,22 @@ public struct NavigationBar: PageElement, HasChildren {
 
 
 public struct TabBar: PageElement, HasChildren {
-    public let elementIdentifier = UUID()
+    public let elementIdentifier: PageElementIdentifier
 
     public let elements: [PageElement]
 
     init(elements: [PageElement]) {
+        self.elementIdentifier = .dynamic
         self.elements = elements
     }
 
-    public init(@PageBuilder elements: () -> PageDescription) {
+    public init(
+        @PageBuilder elements: () -> PageDescription,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column
+    ) {
+        self.elementIdentifier = .init(file: file, line: line, column: column)
         self.elements = elements().elements
     }
 
@@ -106,15 +135,22 @@ public struct TabBar: PageElement, HasChildren {
 
 
 public struct CollectionView: PageElement, HasChildren {
-    public let elementIdentifier = UUID()
+    public let elementIdentifier: PageElementIdentifier
 
     public let elements: [PageElement]
 
     init(elements: [PageElement]) {
+        self.elementIdentifier = .dynamic
         self.elements = elements
     }
 
-    public init(@PageBuilder elements: () -> PageDescription) {
+    public init(
+        @PageBuilder elements: () -> PageDescription,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column
+    ) {
+        self.elementIdentifier = .init(file: file, line: line, column: column)
         self.elements = elements().elements
     }
 
@@ -130,15 +166,22 @@ public struct CollectionView: PageElement, HasChildren {
 
 
 public struct Cell: PageElement, HasChildren {
-    public let elementIdentifier = UUID()
+    public let elementIdentifier: PageElementIdentifier
 
     public let elements: [PageElement]
 
     init(elements: [PageElement]) {
+        self.elementIdentifier = .dynamic
         self.elements = elements
     }
 
-    public init(@PageBuilder elements: () -> PageDescription) {
+    public init(
+        @PageBuilder elements: () -> PageDescription,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column
+    ) {
+        self.elementIdentifier = .init(file: file, line: line, column: column)
         self.elements = elements().elements
     }
 
@@ -154,11 +197,17 @@ public struct Cell: PageElement, HasChildren {
 
 
 public struct TextField: PageElement {
-    public let elementIdentifier = UUID()
+    public let elementIdentifier: PageElementIdentifier
 
     public let identifier: String?
 
-    public init(identifier: String? = nil) {
+    public init(
+        identifier: String? = nil,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column
+    ) {
+        self.elementIdentifier = .init(file: file, line: line, column: column)
         self.identifier = identifier
     }
 
@@ -177,8 +226,7 @@ extension TextField {
     public func type(text: String) {
         // TODO: better activity description
         XCTContext.runActivity(named: "Typing text \(text.debugDescription)") { activity in
-            guard let app = getApp(forAction: "type(text: \(text.debugDescription)") else { return }
-            let element = query(appending: app.windows).element
+            guard let element = getXCUIElement(forAction: "type(text: \(text.debugDescription)") else { return }
             if !element.hasFocus {
                 element.tap()
             }
@@ -189,40 +237,53 @@ extension TextField {
 
 extension PageElement {
 
-    func getApp(forAction action: String) -> XCUIApplication? {
-        guard let applicationIdentifier = stableElementsStore[elementIdentifier] else {
+    func getXCUIElement(forAction action: String) -> XCUIElement? {
+        guard let cacheEntry = elementCache[elementIdentifier] else {
             assertionFailure("\(action) called before page.exists()!")
             return nil
         }
-        if let applicationIdentifier {
-            return XCUIApplication(bundleIdentifier: applicationIdentifier)
+
+        let application: XCUIApplication
+        if let bundleIdentifier = cacheEntry.application {
+            application = XCUIApplication(bundleIdentifier: bundleIdentifier)
+        } else {
+            application = XCUIApplication()
         }
-        return XCUIApplication()
+
+        guard let firstPathComponent = cacheEntry.path.first else { return nil }
+        var query: XCUIElementQuery = application.query(queryIdentifier: firstPathComponent)
+        for nextPathComponent in cacheEntry.path[1...] {
+            query = query.query(queryIdentifier: nextPathComponent)
+        }
+
+        return query.element
     }
 
     public func tap() {
-        guard let app = getApp(forAction: "tap()") else { return }
-        query(appending: app.windows).element.tap()
+        guard let element = getXCUIElement(forAction: "tap()") else { return }
+        element.tap()
     }
 }
 
 
-extension PageElement {
-    func query(appending query: XCUIElementQuery) -> XCUIElementQuery {
+extension XCUIElementTypeQueryProvider {
+    func query(queryIdentifier: QueryIdentifier) -> XCUIElementQuery {
         let usedQuery: XCUIElementQuery
         switch queryIdentifier.elementType {
         case .button:
-            usedQuery = query.buttons
+            usedQuery = buttons
         case .staticText:
-            usedQuery = query.buttons
+            usedQuery = staticTexts
         case .collectionView:
-            usedQuery = query.collectionViews
+            usedQuery = collectionViews
         case .cell:
-            usedQuery = query.cells
+            usedQuery = cells
         case .tabBar:
-            usedQuery = query.tabBars
+            usedQuery = tabBars
         case .textField:
-            usedQuery = query.textFields
+            usedQuery = textFields
+        case .navigationBar:
+            usedQuery = navigationBars
         default:
             fatalError()
         }
@@ -246,7 +307,10 @@ extension PageElement {
             return true
         }))
     }
+}
 
+
+extension PageElement {
     func exists(in snapshot: XCUIElementSnapshot) -> Bool {
         snapshot.find(queryIdentifier: queryIdentifier).isEmpty == false
     }

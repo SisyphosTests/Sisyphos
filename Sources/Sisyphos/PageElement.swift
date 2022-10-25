@@ -59,8 +59,8 @@ public struct Button: PageElement {
     }
 
     public init(
-        label: String? = nil,
         identifier: String? = nil,
+        label: String? = nil,
         file: String = #file,
         line: UInt = #line,
         column: UInt = #column

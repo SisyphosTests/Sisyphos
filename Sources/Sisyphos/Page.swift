@@ -1,4 +1,5 @@
 import XCTest
+import UniformTypeIdentifiers
 
 
 public protocol Page {
@@ -13,6 +14,13 @@ public extension Page {
 
 
 extension Page {
+    /// The name of the page which is displayed to the user, e.g. in error messages or debug output.
+    var debugName: String {
+        String(describing: type(of: self))
+    }
+}
+
+extension Page {
     var xcuiapplication: XCUIApplication {
         if let application {
             return XCUIApplication(bundleIdentifier: application)
@@ -25,7 +33,7 @@ extension Page {
 public extension Page {
     func exists() -> Bool {
         buildPathCache()
-        return XCTContext.runActivity(named: "Check if page \(String(describing: type(of: self))) exists") { activity in
+        return XCTContext.runActivity(named: "Check if page \(debugName) exists") { activity in
             guard let snapshot = try? xcuiapplication.snapshot() else { return false }
             TestData.isEvaluatingBody = true
             for element in body.elements {
@@ -36,17 +44,38 @@ public extension Page {
         }
     }
 
-    func waitForExistence(timeout: CFTimeInterval = 10) {
-        let runLoop = RunLoop.current
-        var iteration: CFTimeInterval = 0
-        repeat {
-            guard !exists() else { return }
-            // TODO: checking the UI also took some time already, so this method actually waits longer than the timeout.
-            //   Refactor to make it respect the timeout.
-            _ = runLoop.run(mode: .default, before: Date(timeIntervalSinceNow: 1))
-            iteration += 1
-        } while iteration < timeout
-        XCTFail() // FIXME good error message
+    func waitForExistence(
+        timeout: CFTimeInterval = 10,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) {
+        XCTContext.runActivity(named: "Wait max \(timeout)s for page \(debugName) to exit") { activity in
+            let runLoop = RunLoop.current
+            var iteration: CFTimeInterval = 0
+            repeat {
+                guard !exists() else { return }
+                // TODO: checking the UI also took some time already, so this method actually waits longer than the timeout.
+                //   Refactor to make it respect the timeout.
+                _ = runLoop.run(mode: .default, before: Date(timeIntervalSinceNow: 1))
+                iteration += 1
+            } while iteration < timeout
+
+            let debugPage = xcuiapplication.currentPage?.generatePageSource()
+            if let data = debugPage?.data(using: .utf8) {
+                activity.add(
+                    XCTAttachment(
+                        uniformTypeIdentifier: UTType.swiftSource.identifier,
+                        name: "ActualPage.swift",
+                        payload: data
+                    )
+                )
+            }
+
+            XCTFail(
+                file: file,
+                line: line
+            ) // FIXME good error message. It should tell which expected elements are missing
+        }
     }
 
     private func buildPathCache() {

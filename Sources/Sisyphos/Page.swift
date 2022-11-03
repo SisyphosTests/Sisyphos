@@ -30,17 +30,28 @@ extension Page {
     }
 }
 
+
+public struct PageExistsResults {
+    public let missingElements: [PageElement]
+
+    public var isExisting: Bool {
+        missingElements.isEmpty
+    }
+}
+
+
 public extension Page {
-    func exists() -> Bool {
-        buildPathCache()
-        return XCTContext.runActivity(named: "Check if page \(debugName) exists") { activity in
-            guard let snapshot = try? xcuiapplication.snapshot() else { return false }
-            TestData.isEvaluatingBody = true
-            for element in body.elements {
-                guard element.exists(in: snapshot) else { return false }
+    func exists() -> PageExistsResults {
+        XCTContext.runActivity(named: "Check if page \(debugName) exists") { activity in
+            guard let snapshot = try? xcuiapplication.snapshot() else {
+                return PageExistsResults(missingElements: body.elements)
             }
-            TestData.isEvaluatingBody = false
-            return true
+            let finder = ElementFinder(page: self, snapshot: snapshot)
+            TestData.isEvaluatingBody = true
+            defer {
+                TestData.isEvaluatingBody = false
+            }
+            return PageExistsResults(missingElements: finder.check())
         }
     }
 
@@ -49,16 +60,16 @@ public extension Page {
         file: StaticString = #file,
         line: UInt = #line
     ) {
-        XCTContext.runActivity(named: "Wait max \(timeout)s for page \(debugName) to exit") { activity in
+        XCTContext.runActivity(named: "Wait max \(timeout)s for page \(debugName) to exist") { activity in
             let runLoop = RunLoop.current
-            var iteration: CFTimeInterval = 0
+            let deadline = Date(timeIntervalSinceNow: timeout)
+            var results: PageExistsResults?
             repeat {
-                guard !exists() else { return }
-                // TODO: checking the UI also took some time already, so this method actually waits longer than the timeout.
-                //   Refactor to make it respect the timeout.
+                let currentResults = exists()
+                guard !currentResults.isExisting else { return }
+                results = currentResults
                 _ = runLoop.run(mode: .default, before: Date(timeIntervalSinceNow: 1))
-                iteration += 1
-            } while iteration < timeout
+            } while Date() < deadline
 
             let debugPage = xcuiapplication.currentPage?.generatePageSource()
             if let data = debugPage?.data(using: .utf8) {
@@ -72,35 +83,38 @@ public extension Page {
             }
 
             XCTFail(
+                "Page \(debugName) didn't exist after \(timeout)s"
+                + (results?.failureDescription ?? ""),
                 file: file,
                 line: line
-            ) // FIXME good error message. It should tell which expected elements are missing
+            )
         }
     }
+}
 
-    private func buildPathCache() {
-        func walk(element: PageElement, alreadyWalkedPathToElement: [QueryIdentifier]) {
-            let pathOfElement = alreadyWalkedPathToElement + [element.queryIdentifier]
-            elementCache[element.elementIdentifier] = CacheEntry(
-                application: application,
-                path: pathOfElement
-            )
-
-            guard let hasChildren = element as? HasChildren else { return }
-            for child in hasChildren.elements {
-                walk(element: child, alreadyWalkedPathToElement: pathOfElement)
-            }
+extension Page {
+    func refreshElementCache() {
+        guard let snapshot = try? xcuiapplication.snapshot() else {
+            return
         }
-
-        for element in body.elements {
-            walk(element: element, alreadyWalkedPathToElement: [])
-        }
+        let finder = ElementFinder(page: self, snapshot: snapshot)
+        _ = finder.check()
     }
 }
 
 var elementCache: [PageElementIdentifier: CacheEntry] = [:]
 
 struct CacheEntry {
-    let application: String?
-    let path: [QueryIdentifier]
+    let page: Page
+    let path: [Snapshot.PathStep]
+    let index: Int
+}
+
+
+private extension PageExistsResults {
+    var failureDescription: String {
+        missingElements.map {
+            "\n⛔️ missing element \(type(of: $0)), defined at \($0.elementIdentifier.file) \($0.elementIdentifier.line):\($0.elementIdentifier.column)"
+        }.joined()
+    }
 }

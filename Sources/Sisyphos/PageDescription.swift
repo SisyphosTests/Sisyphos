@@ -20,7 +20,7 @@ extension PageDescription {
 private extension PageElement {
     func prettyPrint(indentation: Int) -> String {
         let indentationString = String(repeating: "  ", count: indentation)
-        var output = "\(indentationString)\(String(describing: type(of: self)))("
+        var output = "\(indentationString)\(String(describing: Swift.type(of: self)))"
         var properties: [(propertyName: String, value: String)] = Mirror(reflecting: self).children.compactMap { (property, value) in
             guard let property else { return nil }
             guard !["elementIdentifier", "elements"].contains(property) else { return nil }
@@ -30,6 +30,9 @@ private extension PageElement {
                 propertyName: property,
                 value: stringValue.debugDescription
             )
+        }
+        if !properties.isEmpty || !(self is HasChildren) {
+            output += "("
         }
         properties.sort { left, right in
             switch left.propertyName {
@@ -52,7 +55,9 @@ private extension PageElement {
                 output += "\(propertyName): \(value)"
             }
         }
-        output += ")"
+        if !properties.isEmpty || !(self is HasChildren) {
+            output += ")"
+        }
         if let hasChildren = self as? HasChildren {
             output += " {\n"
             for child in hasChildren.elements {

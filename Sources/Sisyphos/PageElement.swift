@@ -209,7 +209,7 @@ public struct Cell: PageElement, HasChildren {
 }
 
 
-public struct TextField: PageElement, TextInput {
+public struct TextField: PageElement {
     public let elementIdentifier: PageElementIdentifier
 
     public let identifier: String?
@@ -240,7 +240,7 @@ public struct TextField: PageElement, TextInput {
 }
 
 
-public struct SecureTextField: PageElement, TextInput {
+public struct SecureTextField: PageElement {
     public let elementIdentifier: PageElementIdentifier
 
     public let identifier: String?
@@ -271,113 +271,139 @@ public struct SecureTextField: PageElement, TextInput {
 }
 
 
-public protocol TextInput: PageElement {}
-
-extension TextInput {
-    public func type(text: String) {
-        // TODO: better activity description
-        XCTContext.runActivity(named: "Typing text \(text.debugDescription)") { activity in
-            guard let element = getXCUIElementQuery(forAction: "type(text: \(text.debugDescription)")?.element else { return }
-            element.tap()
-            element.typeText(text)
-        }
-    }
-}
-
-
 extension PageElement {
 
-    func getXCUIElementQuery(forAction action: String) -> XCUIElementQuery? {
+    func getXCUIElement(forAction action: String) -> XCUIElement? {
         guard let cacheEntry = elementCache[elementIdentifier] else {
             assertionFailure("\(action) called before page.exists()!")
             return nil
         }
 
-        let application: XCUIApplication
-        if let bundleIdentifier = cacheEntry.application {
-            application = XCUIApplication(bundleIdentifier: bundleIdentifier)
-        } else {
-            application = XCUIApplication()
+        let application = cacheEntry.page.xcuiapplication
+        let query = application.query(path: cacheEntry.path)
+
+        return query.element(boundBy: cacheEntry.index)
+    }
+
+    private func getPage() -> Page? {
+        guard let cacheEntry = elementCache[elementIdentifier] else {
+            return nil
         }
 
-        guard let firstPathComponent = cacheEntry.path.first else { return nil }
-        var query: XCUIElementQuery = application.query(queryIdentifier: firstPathComponent)
-        for nextPathComponent in cacheEntry.path[1...] {
-            query = query.query(queryIdentifier: nextPathComponent)
+        return cacheEntry.page
+    }
+
+    func getAllXCUIElements(forAction action: String) -> XCUIElementQuery? {
+        guard let cacheEntry = elementCache[elementIdentifier] else {
+            assertionFailure("\(action) called before page.exists()!")
+            return nil
         }
 
-        return query
+        let application = cacheEntry.page.xcuiapplication
+
+        return application.query(path: cacheEntry.path)
     }
 
     public func tap() {
-        guard let element = getXCUIElementQuery(forAction: "tap()")?.element else { return }
+        guard let element = getXCUIElement(forAction: "tap()") else { return }
         element.tap()
+
+        // The interaction can change the hierarchy, so we need to refresh.
+        getPage()?.refreshElementCache()
     }
 
     public func tapAny() {
-        guard let element = getXCUIElementQuery(forAction: "tap()")?.firstMatch else { return }
+        guard let element = getAllXCUIElements(forAction: "tap()")?.firstMatch else { return }
         element.tap()
+
+        // The interaction can change the hierarchy, so we need to refresh.
+        getPage()?.refreshElementCache()
     }
-}
 
+    public func type(text: String, dismissKeyboard: Bool = true) {
+        // TODO: better activity description
+        XCTContext.runActivity(named: "Typing text \(text.debugDescription)") { activity in
+            guard let element = getXCUIElement(forAction: "type(text: \(text.debugDescription)") else { return }
+            element.tap()
+            element.typeText(text)
 
-extension XCUIElementTypeQueryProvider {
-    func query(queryIdentifier: QueryIdentifier) -> XCUIElementQuery {
-        let usedQuery: XCUIElementQuery
-        switch queryIdentifier.elementType {
-        case .button:
-            usedQuery = buttons
-        case .staticText:
-            usedQuery = staticTexts
-        case .collectionView:
-            usedQuery = collectionViews
-        case .cell:
-            usedQuery = cells
-        case .tabBar:
-            usedQuery = tabBars
-        case .textField:
-            usedQuery = textFields
-        case .navigationBar:
-            usedQuery = navigationBars
-        case .secureTextField:
-            usedQuery = secureTextFields
-        default:
-            fatalError()
+            if dismissKeyboard, let toolbars = getPage()?.xcuiapplication.toolbars {
+                if toolbars.count > 0 {
+                    let dismissButton = toolbars.firstMatch.buttons.element(boundBy: 2)
+                    if dismissButton.exists {
+                        dismissButton.tap()
+                    }
+                }
+            }
+
+            // The interaction can change the hierarchy, so we need to refresh.
+            getPage()?.refreshElementCache()
         }
-        return usedQuery.matching(NSPredicate(block: { object, _ in
-            // Apple's documentation says that the passed object is `XCUIElementAttributes`, but the object is a
-            // `XCUIElementSnapshot` (which implements `XCUIElementAttributes`, so we can use this hack.
-            guard let snapshot = object as? XCUIElementSnapshot else {
-                assertionFailure()
-                return false
-            }
-            guard snapshot.elementType == queryIdentifier.elementType else { return false }
-            if let identifier = queryIdentifier.identifier {
-                guard snapshot.identifier == identifier else { return false }
-            }
-            if let label = queryIdentifier.label {
-                guard snapshot.matches(searchedLabel: label) else { return false }
-            }
-            if let searchedValue = queryIdentifier.value, let value = snapshot.value {
-                guard value as? String == searchedValue else { return false }
-            }
-            for descendant in queryIdentifier.descendants {
-                guard !snapshot.find(queryIdentifier: descendant).isEmpty else { return false}
-            }
-            return true
-        }))
+    }
+
+    public func waitUntilIsHittable(
+        timeout: CFTimeInterval = 10,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) {
+        guard let element = getXCUIElement(forAction: "wait until hittable") else { return }
+        let deadline = Date(timeIntervalSinceNow: timeout)
+        repeat {
+            guard !element.isHittable else { return }
+            _ = RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 1))
+        } while Date() < deadline
+
+        XCTFail(
+            "Did not become hittable after \(timeout)s",
+            file: file,
+            line: line
+        )
+    }
+
+    public var path: [Snapshot.PathStep]? {
+        elementCache[elementIdentifier]?.path
+    }
+
+    /// For debugging only. Please don't use this for writing tests.
+    public var element: XCUIElement {
+        getXCUIElement(forAction: "debugging the element")!
     }
 }
 
 
-extension PageElement {
-    func exists(in snapshot: XCUIElementSnapshot) -> Bool {
-        snapshot.find(queryIdentifier: queryIdentifier).isEmpty == false
+// Needed hack because `XCUIApplication` doesn't conform to `XCUIElementQuery`.
+protocol ChildrenQueryProvider {
+    func descendants(matching: XCUIElement.ElementType) -> XCUIElementQuery
+}
+
+extension XCUIApplication: ChildrenQueryProvider {}
+extension XCUIElementQuery: ChildrenQueryProvider {}
+
+
+extension XCUIApplication {
+    func query(path: [Snapshot.PathStep]) -> XCUIElementQuery {
+        var usedQuery: ChildrenQueryProvider = self
+        for step in path[1...] { // First step is always the application itself, so we skip it.
+            guard step.elementType != .other else { continue }
+            usedQuery = usedQuery.descendants(matching: step.elementType).matching(NSPredicate(block: { [step] object, _ in
+                guard let snapshot = object as? XCUIElementAttributes else {
+                    assertionFailure()
+                    return false
+                }
+                return
+                    snapshot.elementType == step.elementType
+                    && snapshot.identifier == step.identifier
+                    && snapshot.label.matches(searchedLabel: step.label)
+                    && snapshot.value as? String == step.value
+            }))
+        }
+
+        return usedQuery as! XCUIElementQuery
     }
 }
 
 
-private extension XCUIElementSnapshot {
+extension String {
 
     func matches(searchedLabel: String) -> Bool {
         let variableMatches = TestData.regex.matches(
@@ -385,7 +411,7 @@ private extension XCUIElementSnapshot {
             range: NSRange(location: 0, length: searchedLabel.utf16.count)
         )
         guard !variableMatches.isEmpty else {
-            return searchedLabel == label
+            return searchedLabel == self
         }
 
         let variables: [UUID] = variableMatches.compactMap { match -> UUID? in
@@ -401,46 +427,13 @@ private extension XCUIElementSnapshot {
             assertionFailure()
             return false
         }
-        let valueMatches = regex.matches(in: label, range: NSRange(location: 0, length: label.utf16.count))
+        let valueMatches = regex.matches(in: self, range: NSRange(location: 0, length: utf16.count))
         for (index, match) in valueMatches.enumerated() {
-            guard let range = Range(match.range(at: 1), in: label) else { continue }
-            let value = label[range]
+            guard let range = Range(match.range(at: 1), in: self) else { continue }
+            let value = self[range]
             TestData[variables[index]] = String(value)
         }
 
         return true
     }
-
-    func find(queryIdentifier: QueryIdentifier) -> [XCUIElementSnapshot] {
-        // TODO: We flatten the entire tree which is not very efficient. We could cancel when we find the element and
-        //   don't need to walk the rest of the tree.
-        flatten(element: self).filter { element in
-            guard element.elementType == queryIdentifier.elementType else { return false }
-            if let identifier = queryIdentifier.identifier {
-                guard element.identifier == identifier else { return false }
-            }
-            if let label = queryIdentifier.label {
-                guard element.matches(searchedLabel: label) else { return false }
-            }
-            if let searchedValue = queryIdentifier.value, let value {
-                guard value as? String == searchedValue else { return false }
-            }
-            for descendant in queryIdentifier.descendants {
-                guard find(queryIdentifier: descendant).isEmpty == false else { return false }
-            }
-            return true
-        }
-    }
-}
-
-
-extension PageElement {
-    var declaration: String {
-        "\(elementIdentifier.file) line \(elementIdentifier.line), column \(elementIdentifier.column)"
-    }
-}
-
-
-private func flatten(element: XCUIElementSnapshot) -> [XCUIElementSnapshot] {
-    return [element] + element.children.flatMap(flatten(element:))
 }

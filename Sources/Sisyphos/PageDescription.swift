@@ -5,8 +5,8 @@ public struct PageDescription {
 }
 
 extension PageDescription {
-    func generatePageSource() -> String {
-        var output = "struct DebugPage: Page {\n  var body: PageDescription {\n"
+    public func generatePageSource(pageName: String = "DebugPage") -> String {
+        var output = "struct \(pageName): Page {\n  var body: PageDescription {\n"
         for element in elements {
             output += element.prettyPrint(indentation: 2) + "\n"
         }
@@ -40,6 +40,8 @@ private extension PageElement {
                 return false
             case "label":
                 return right.propertyName != "identifier"
+            case "text":
+                return false
             default:
                 return true
             }

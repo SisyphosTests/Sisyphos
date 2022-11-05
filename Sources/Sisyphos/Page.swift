@@ -56,7 +56,7 @@ public extension Page {
     }
 
     func waitForExistence(
-        timeout: CFTimeInterval = 10,
+        timeout: CFTimeInterval = 15,
         file: StaticString = #file,
         line: UInt = #line
     ) {

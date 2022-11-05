@@ -278,6 +278,11 @@ extension PageElement {
             assertionFailure("\(action) called before page.exists()!")
             return nil
         }
+        cacheEntry.page.refreshElementCache()
+        guard let cacheEntry = elementCache[elementIdentifier] else {
+            assertionFailure("\(action) called before page.exists()!")
+            return nil
+        }
 
         let application = cacheEntry.page.xcuiapplication
         let query = application.query(path: cacheEntry.path)
@@ -298,6 +303,11 @@ extension PageElement {
             assertionFailure("\(action) called before page.exists()!")
             return nil
         }
+        cacheEntry.page.refreshElementCache()
+        guard let cacheEntry = elementCache[elementIdentifier] else {
+            assertionFailure("\(action) called before page.exists()!")
+            return nil
+        }
 
         let application = cacheEntry.page.xcuiapplication
 
@@ -306,24 +316,21 @@ extension PageElement {
 
     public func tap() {
         guard let element = getXCUIElement(forAction: "tap()") else { return }
+        element.waitUntilStablePosition()
         element.tap()
-
-        // The interaction can change the hierarchy, so we need to refresh.
-        getPage()?.refreshElementCache()
     }
 
     public func tapAny() {
         guard let element = getAllXCUIElements(forAction: "tap()")?.firstMatch else { return }
+        element.waitUntilStablePosition()
         element.tap()
-
-        // The interaction can change the hierarchy, so we need to refresh.
-        getPage()?.refreshElementCache()
     }
 
     public func type(text: String, dismissKeyboard: Bool = true) {
         // TODO: better activity description
         XCTContext.runActivity(named: "Typing text \(text.debugDescription)") { activity in
             guard let element = getXCUIElement(forAction: "type(text: \(text.debugDescription)") else { return }
+            element.waitUntilStablePosition()
             element.tap()
             element.typeText(text)
 
@@ -335,9 +342,6 @@ extension PageElement {
                     }
                 }
             }
-
-            // The interaction can change the hierarchy, so we need to refresh.
-            getPage()?.refreshElementCache()
         }
     }
 

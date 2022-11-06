@@ -7,7 +7,7 @@ public protocol PageElement {
     var queryIdentifier: QueryIdentifier { get }
 }
 
-public protocol HasChildren {
+protocol HasChildren {
     var elements: [PageElement] { get }
 }
 
@@ -362,10 +362,6 @@ extension PageElement {
             file: file,
             line: line
         )
-    }
-
-    public var path: [Snapshot.PathStep]? {
-        elementCache[elementIdentifier]?.path
     }
 
     /// For debugging only. Please don't use this for writing tests.

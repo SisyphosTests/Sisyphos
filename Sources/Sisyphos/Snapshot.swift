@@ -1,7 +1,7 @@
 import XCTest
 
 
-public struct Snapshot {
+struct Snapshot {
     let index: UInt
     let path: [PathStep]
     let snapshotIdentifier = UUID()

@@ -11,13 +11,19 @@ extension XCUIElement {
     func waitUntilStablePosition(timeout: CFTimeInterval = 2) {
         XCTContext.runActivity(named: "Wait for element to have a stable position") { activity in
             let timeout = Date(timeIntervalSinceNow: timeout)
-            var lastPosition: CGRect = frame
+            var lastPosition: CGRect = getFrame()
             repeat {
-                guard lastPosition != frame else { return }
-                lastPosition = frame
+                let newFrame = getFrame()
+                guard lastPosition != newFrame else { return }
+                lastPosition = newFrame
                 _ = RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.1))
             } while Date() < timeout
         }
     }
 
+    func getFrame() -> CGRect {
+        guard self.exists else { return .zero }
+
+        return frame
+    }
 }

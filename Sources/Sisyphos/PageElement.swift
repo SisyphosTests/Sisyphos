@@ -274,6 +274,9 @@ public struct SecureTextField: PageElement {
 extension PageElement {
 
     func getXCUIElement(forAction action: String) -> XCUIElement? {
+        // TODO: We should make the handling of interruptions configurable.
+        handleInterruptions()
+
         guard let cacheEntry = elementCache[elementIdentifier] else {
             assertionFailure("\(action) called before page.exists()!")
             return nil
@@ -299,6 +302,9 @@ extension PageElement {
     }
 
     func getAllXCUIElements(forAction action: String) -> XCUIElementQuery? {
+        // TODO: We should make the handling of interruptions configurable.
+        handleInterruptions()
+
         guard let cacheEntry = elementCache[elementIdentifier] else {
             assertionFailure("\(action) called before page.exists()!")
             return nil
@@ -446,5 +452,21 @@ extension String {
         }
 
         return true
+    }
+}
+
+/// Automatically handles system alerts like push notification permissions.
+// They are handled by pressing the "Don’t Allow" button.
+// If it can't find the "Don’t Allow", the first button is pressed (which is usally the button for declining).
+private func handleInterruptions() {
+    let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+    guard springboard.alerts.count > 0 else { return }
+    for alert in springboard.alerts.allElementsBoundByAccessibilityElement {
+        let dontAllowButton = alert.buttons["Don’t Allow".localizedForSimulator]
+        if dontAllowButton.exists {
+            dontAllowButton.tap()
+        } else {
+            alert.buttons.firstMatch.tap()
+        }
     }
 }

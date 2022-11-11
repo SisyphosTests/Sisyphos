@@ -331,7 +331,7 @@ extension PageElement {
         XCTContext.runActivity(named: "Typing text \(text.debugDescription)") { activity in
             guard let element = getXCUIElement(forAction: "type(text: \(text.debugDescription)") else { return }
             element.waitUntilStablePosition()
-            element.tap()
+            element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
             element.typeText(text)
 
             guard dismissKeyboard else { return }

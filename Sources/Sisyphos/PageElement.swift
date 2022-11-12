@@ -271,10 +271,41 @@ public struct SecureTextField: PageElement {
 }
 
 
+public struct Alert: PageElement, HasChildren {
+
+    public let elementIdentifier: PageElementIdentifier
+
+    public let identifier: String?
+
+    public let elements: [PageElement]
+
+    public init(
+        identifier: String? = nil,
+        @PageBuilder children: () -> PageDescription,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column
+    ) {
+        self.elementIdentifier = .init(file: file, line: line, column: column)
+        self.identifier = identifier
+        self.elements = children().elements
+    }
+
+    public var queryIdentifier: QueryIdentifier {
+        .init(
+            elementType: .alert,
+            identifier: identifier,
+            label: nil,
+            value: nil,
+            descendants: []
+        )
+    }
+}
+
+
 extension PageElement {
 
     func getXCUIElement(forAction action: String) -> XCUIElement? {
-        // TODO: We should make the handling of interruptions configurable.
         handleInterruptions()
 
         guard let cacheEntry = elementCache[elementIdentifier] else {
@@ -302,7 +333,6 @@ extension PageElement {
     }
 
     func getAllXCUIElements(forAction action: String) -> XCUIElementQuery? {
-        // TODO: We should make the handling of interruptions configurable.
         handleInterruptions()
 
         guard let cacheEntry = elementCache[elementIdentifier] else {
@@ -455,18 +485,7 @@ extension String {
     }
 }
 
-/// Automatically handles system alerts like push notification permissions.
-// They are handled by pressing the "Don’t Allow" button.
-// If it can't find the "Don’t Allow", the first button is pressed (which is usally the button for declining).
+/// Automatically handles system alerts like push notification permissions as well as user defined UI interruptions.
 private func handleInterruptions() {
-    let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
-    guard springboard.alerts.count > 0 else { return }
-    for alert in springboard.alerts.allElementsBoundByAccessibilityElement {
-        let dontAllowButton = alert.buttons["Don’t Allow".localizedForSimulator]
-        if dontAllowButton.exists {
-            dontAllowButton.tap()
-        } else {
-            alert.buttons.firstMatch.tap()
-        }
-    }
+    UIInterruptionsObserver.shared.checkForInterruptions()
 }

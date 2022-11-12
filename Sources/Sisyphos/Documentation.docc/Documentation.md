@@ -31,6 +31,7 @@ Please report any bugs or feature requests at its [GitHub project](https://githu
 
 ### Page Elements
 
+- ``Alert``
 - ``Button``
 - ``Cell``
 - ``CollectionView``

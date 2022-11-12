@@ -43,6 +43,8 @@ public struct PageExistsResults {
 public extension Page {
     func exists() -> PageExistsResults {
         XCTContext.runActivity(named: "Check if page \(debugName) exists") { activity in
+            UIInterruptionsObserver.shared.checkForInterruptions()
+
             guard let snapshot = try? xcuiapplication.snapshot() else {
                 return PageExistsResults(missingElements: body.elements)
             }

@@ -1,7 +1,7 @@
 
 
 public struct PageDescription {
-    let elements: [PageElement]
+    public let elements: [PageElement]
 }
 
 extension PageDescription {

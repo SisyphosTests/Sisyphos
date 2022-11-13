@@ -31,6 +31,21 @@ final class PageBuilderTests: XCTestCase {
         XCTAssertTrue(secondPage.elements[2] is StaticText)
     }
 
+    func testOptionals() {
+        func createPage(maybeElement: StaticText?) -> PageDescription {
+            page {
+                maybeElement
+            }
+        }
+
+        let firstPage = createPage(maybeElement: nil)
+        XCTAssertEqual(firstPage.elements.count, 0)
+
+        let secondPage = createPage(maybeElement: StaticText("First Element"))
+        XCTAssertEqual(secondPage.elements.count, 1)
+        XCTAssertTrue(secondPage.elements[0] is StaticText)
+    }
+
     func testNavigationBar() throws {
         let page = page {
             NavigationBar {

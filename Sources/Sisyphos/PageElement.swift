@@ -1,7 +1,7 @@
 import XCTest
 
 
-public protocol PageElement {
+public protocol PageElement: PageDescriptionBlock {
     var elementIdentifier: PageElementIdentifier { get }
 
     var queryIdentifier: QueryIdentifier { get }

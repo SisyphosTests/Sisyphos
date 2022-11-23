@@ -388,6 +388,17 @@ extension PageElement {
         element.tap()
     }
 
+    /// In the current scenarios, we observed that the static text element on the WebView is not hittable when the
+    /// regular `tap()` function has been used. The reason is that XCUIElement recognizes the object as not accessible,
+    /// but it's not true. To avoid non-accessible situations, we need to tap on the component by using offset
+    /// coordinates.
+    /// - Parameter coordinates: Offset coordinates to specify tap position
+    public func tap(usingCoordinates coordinates: CGVector) {
+        guard let element = getXCUIElement(forAction: "tap()") else { return }
+        element.waitUntilStablePosition()
+        element.coordinate(withNormalizedOffset: coordinates).tap()
+    }
+
     public func type(text: String, dismissKeyboard: Bool = true) {
         // TODO: better activity description
         XCTContext.runActivity(named: "Typing text \(text.debugDescription)") { activity in

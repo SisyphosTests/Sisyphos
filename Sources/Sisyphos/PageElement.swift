@@ -411,6 +411,53 @@ extension PageElement {
         )
     }
 
+    /// Scrolls on the screen until the element is in the visible area.
+    /// - Parameters:
+    ///   - direction: Indicates the direction of the scroll.
+    ///   - maxTryCount: Specifies how many attempts should it apply.
+    ///   - velocity: Specifies the velocity of the scrolling.
+    ///   - file: Name of the file that will be displayed if it fails.
+    ///   - line: Line number that will be displayed if it fails.
+    public func scrollUntilVisibleOnScreen(
+        direction: UIAccessibilityScrollDirection,
+        maxTryCount: Int = 5,
+        velocity: XCUIGestureVelocity = .slow,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) {
+        guard let element = getXCUIElement(forAction: "scroll until visible") else { return }
+        guard let app = getPage()?.xcuiapplication else { return }
+        guard !CGRectContainsRect(app.windows.element(boundBy: 0).frame, element.frame) else { return }
+        var tryCounter = maxTryCount
+        repeat {
+            switch direction {
+            case .down:
+                app.swipeUp(velocity: velocity)
+            case .up:
+                app.swipeDown(velocity: velocity)
+            case .left:
+                app.swipeRight(velocity: velocity)
+            case .right:
+                app.swipeLeft(velocity: velocity)
+            default:
+                XCTFail(
+                    "Unknown scroll direction: \(direction)",
+                    file: file,
+                    line: line
+                )
+            }
+            element.waitUntilStablePosition()
+            tryCounter -= 1
+            guard !CGRectContainsRect(app.windows.element(boundBy: 0).frame, element.frame) else { return }
+        } while tryCounter > 0
+
+        XCTFail(
+            "Did not exist after attempting \(maxTryCount) times scrolling",
+            file: file,
+            line: line
+        )
+    }
+
     /// For debugging only. Please don't use this for writing tests.
     public var element: XCUIElement {
         getXCUIElement(forAction: "debugging the element")!

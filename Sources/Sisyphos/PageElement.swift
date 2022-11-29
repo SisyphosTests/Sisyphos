@@ -324,6 +324,32 @@ extension PageElement {
         return query.element(boundBy: cacheEntry.index)
     }
 
+    /// It is used for getting the window that contains the element
+    /// - Returns: Corresponding window
+    func getXCUIWindow(forAction action: String) -> XCUIElement? {
+        handleInterruptions()
+
+        guard let cacheEntry = elementCache[elementIdentifier] else {
+            assertionFailure("\(action) called before page.exists()!")
+            return nil
+        }
+        cacheEntry.page.refreshElementCache()
+        guard let cacheEntry = elementCache[elementIdentifier] else {
+            assertionFailure("\(action) called before page.exists()!")
+            return nil
+        }
+
+        let application = cacheEntry.page.xcuiapplication
+        guard
+            let windowIndex = cacheEntry.path.firstIndex(where: { $0.elementType == .window })
+        else {
+            return nil
+        }
+        let query = application.query(path: Array(cacheEntry.path[0...windowIndex]))
+
+        return query.element.firstMatch
+    }
+
     private func getPage() -> Page? {
         guard let cacheEntry = elementCache[elementIdentifier] else {
             return nil
@@ -426,30 +452,36 @@ extension PageElement {
     /// - Parameters:
     ///   - direction: Indicates the direction of the scroll.
     ///   - maxTryCount: Specifies how many attempts should it apply.
-    ///   - velocity: Specifies the velocity of the scrolling.
     ///   - file: Name of the file that will be displayed if it fails.
     ///   - line: Line number that will be displayed if it fails.
+    // TODO: Add PageBuilder argument to make the function more generic
     public func scrollUntilVisibleOnScreen(
         direction: UIAccessibilityScrollDirection,
         maxTryCount: Int = 5,
-        velocity: XCUIGestureVelocity = .slow,
         file: StaticString = #file,
         line: UInt = #line
     ) {
         guard let element = getXCUIElement(forAction: "scroll until visible") else { return }
         guard let app = getPage()?.xcuiapplication else { return }
-        guard !CGRectContainsRect(app.windows.element(boundBy: 0).frame, element.frame) else { return }
+        guard let window = getXCUIWindow(forAction: "scroll until visible") else { return }
+        guard !CGRectContainsRect(window.frame, element.frame) else { return }
         var tryCounter = maxTryCount
+        var startCoordinate = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
         repeat {
+            var endCoordinate = startCoordinate
             switch direction {
             case .down:
-                app.swipeUp(velocity: velocity)
+                endCoordinate = startCoordinate.withOffset(CGVector(dx: 0, dy: -window.frame.height/3))
+                startCoordinate.press(forDuration: 0.05, thenDragTo: endCoordinate)
             case .up:
-                app.swipeDown(velocity: velocity)
+                endCoordinate = startCoordinate.withOffset(CGVector(dx: 0, dy: window.frame.height/3))
+                startCoordinate.press(forDuration: 0.05, thenDragTo: endCoordinate)
             case .left:
-                app.swipeRight(velocity: velocity)
+                endCoordinate = startCoordinate.withOffset(CGVector(dx: window.frame.width/3, dy: 0))
+                startCoordinate.press(forDuration: 0.05, thenDragTo: endCoordinate)
             case .right:
-                app.swipeLeft(velocity: velocity)
+                endCoordinate = startCoordinate.withOffset(CGVector(dx: -window.frame.width/3, dy: 0))
+                startCoordinate.press(forDuration: 0.05, thenDragTo: endCoordinate)
             default:
                 XCTFail(
                     "Unknown scroll direction: \(direction)",
@@ -459,7 +491,8 @@ extension PageElement {
             }
             element.waitUntilStablePosition()
             tryCounter -= 1
-            guard !CGRectContainsRect(app.windows.element(boundBy: 0).frame, element.frame) else { return }
+            startCoordinate = endCoordinate
+            guard !CGRectContainsRect(window.frame, element.frame) else { return }
         } while tryCounter > 0
 
         XCTFail(

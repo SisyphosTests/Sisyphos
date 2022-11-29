@@ -324,6 +324,32 @@ extension PageElement {
         return query.element(boundBy: cacheEntry.index)
     }
 
+    /// It is used for getting the window that contains the element
+    /// - Returns: Corresponding window
+    func getXCUIWindow(forAction action: String) -> XCUIElement? {
+        handleInterruptions()
+
+        guard let cacheEntry = elementCache[elementIdentifier] else {
+            assertionFailure("\(action) called before page.exists()!")
+            return nil
+        }
+        cacheEntry.page.refreshElementCache()
+        guard let cacheEntry = elementCache[elementIdentifier] else {
+            assertionFailure("\(action) called before page.exists()!")
+            return nil
+        }
+
+        let application = cacheEntry.page.xcuiapplication
+        guard
+            let windowIndex = cacheEntry.path.firstIndex(where: { $0.elementType == .window })
+        else {
+            return nil
+        }
+        let query = application.query(path: Array(cacheEntry.path[0...windowIndex]))
+
+        return query.element.firstMatch
+    }
+
     private func getPage() -> Page? {
         guard let cacheEntry = elementCache[elementIdentifier] else {
             return nil
@@ -411,10 +437,66 @@ extension PageElement {
         )
     }
 
+    /// Scrolls on the screen until the element is in the visible area.
+    /// - Parameters:
+    ///   - direction: Indicates the direction of the scroll.
+    ///   - maxTryCount: Specifies how many attempts should it apply.
+    ///   - file: Name of the file that will be displayed if it fails.
+    ///   - line: Line number that will be displayed if it fails.
+    // TODO: Add PageBuilder argument to make the function more generic
+    public func scrollUntilVisibleOnScreen(
+        direction: ScrollDirection,
+        maxTryCount: Int = 5,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) {
+        guard let element = getXCUIElement(forAction: "scroll until visible") else { return }
+        guard let app = getPage()?.xcuiapplication else { return }
+        guard let window = getXCUIWindow(forAction: "scroll until visible") else { return }
+        guard !CGRectContainsRect(window.frame, element.frame) else { return }
+        var tryCounter = maxTryCount
+        var startCoordinate = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        repeat {
+            var endCoordinate = startCoordinate
+            switch direction {
+            case .down:
+                endCoordinate = startCoordinate.withOffset(CGVector(dx: 0, dy: -window.frame.height/3))
+                startCoordinate.press(forDuration: 0.05, thenDragTo: endCoordinate)
+            case .up:
+                endCoordinate = startCoordinate.withOffset(CGVector(dx: 0, dy: window.frame.height/3))
+                startCoordinate.press(forDuration: 0.05, thenDragTo: endCoordinate)
+            case .left:
+                endCoordinate = startCoordinate.withOffset(CGVector(dx: window.frame.width/3, dy: 0))
+                startCoordinate.press(forDuration: 0.05, thenDragTo: endCoordinate)
+            case .right:
+                endCoordinate = startCoordinate.withOffset(CGVector(dx: -window.frame.width/3, dy: 0))
+                startCoordinate.press(forDuration: 0.05, thenDragTo: endCoordinate)
+            }
+            element.waitUntilStablePosition()
+            tryCounter -= 1
+            startCoordinate = endCoordinate
+            guard !CGRectContainsRect(window.frame, element.frame) else { return }
+        } while tryCounter > 0
+
+        XCTFail(
+            "Did not exist after attempting \(maxTryCount) times scrolling",
+            file: file,
+            line: line
+        )
+    }
+
     /// For debugging only. Please don't use this for writing tests.
     public var element: XCUIElement {
         getXCUIElement(forAction: "debugging the element")!
     }
+}
+
+
+public enum ScrollDirection {
+    case down
+    case up
+    case left
+    case right
 }
 
 

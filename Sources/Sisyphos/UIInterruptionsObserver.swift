@@ -99,7 +99,7 @@ extension UIInterruptionsObserver: XCTestObservation {
 
 /// A page to interact with iOS' permission dialogue.
 public struct DefaultPermissionAlert: Page {
-    public let application: String? = "com.apple.springboard"
+    public let application: String = "com.apple.springboard"
 
     /// The text which is displayed in the permission dialogue.
     public let permissionText: String?
@@ -128,7 +128,7 @@ public struct DefaultPermissionAlert: Page {
 
 /// A page to interact with other iOS alerts like the App Tracking Transparency prompt.
 public struct DefaultAlert: Page {
-    public let application: String? = "com.apple.springboard"
+    public let application: String = "com.apple.springboard"
 
     /// The text which is displayed in the alert.
     public let textOfAlert: String?

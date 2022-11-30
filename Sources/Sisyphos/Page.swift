@@ -3,13 +3,13 @@ import UniformTypeIdentifiers
 
 
 public protocol Page {
-    var application: String? { get }
+    var application: String { get }
 
     @PageBuilder var body: PageDescription { get }
 }
 
 public extension Page {
-    var application: String? { nil }
+    var application: String { "" }
 }
 
 
@@ -22,7 +22,7 @@ extension Page {
 
 extension Page {
     var xcuiapplication: XCUIApplication {
-        if let application {
+        if !application.isEmpty {
             return XCUIApplication(bundleIdentifier: application)
         } else {
             return XCUIApplication()

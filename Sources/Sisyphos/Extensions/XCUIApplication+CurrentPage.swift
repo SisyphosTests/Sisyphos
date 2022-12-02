@@ -4,9 +4,14 @@ import XCTest
 public extension XCUIApplication {
     var currentPage: PageDescription? {
         guard let snapshot = try? snapshot() else { return nil }
-        let elements = flatten(element: snapshot)
+        return snapshot.toPage()
+    }
+}
 
-        return PageDescription(elements: elements)
+
+extension XCUIElementSnapshot {
+    func toPage() -> PageDescription {
+        PageDescription(elements: flatten(element: self))
     }
 }
 

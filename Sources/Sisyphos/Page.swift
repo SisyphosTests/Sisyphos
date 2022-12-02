@@ -34,6 +34,8 @@ extension Page {
 public struct PageExistsResults {
     public let missingElements: [PageElement]
 
+    public let actualPage: PageDescription?
+
     public var isExisting: Bool {
         missingElements.isEmpty
     }
@@ -46,14 +48,20 @@ public extension Page {
             UIInterruptionsObserver.shared.checkForInterruptions()
 
             guard let snapshot = try? xcuiapplication.snapshot() else {
-                return PageExistsResults(missingElements: body.elements)
+                return PageExistsResults(
+                    missingElements: body.elements,
+                    actualPage: nil
+                )
             }
             let finder = ElementFinder(page: self, snapshot: snapshot)
             TestData.isEvaluatingBody = true
             defer {
                 TestData.isEvaluatingBody = false
             }
-            return PageExistsResults(missingElements: finder.check())
+            return PageExistsResults(
+                missingElements: finder.check(),
+                actualPage: snapshot.toPage()
+            )
         }
     }
 
@@ -73,8 +81,7 @@ public extension Page {
                 _ = runLoop.run(mode: .default, before: Date(timeIntervalSinceNow: 1))
             } while Date() < deadline
 
-            let debugPage = xcuiapplication.currentPage?.generatePageSource()
-            if let data = debugPage?.data(using: .utf8) {
+            if let data = results?.actualPage?.generatePageSource().data(using: .utf8) {
                 activity.add(
                     XCTAttachment(
                         uniformTypeIdentifier: UTType.swiftSource.identifier,

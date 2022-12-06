@@ -321,7 +321,21 @@ extension PageElement {
         let application = cacheEntry.page.xcuiapplication
         let query = application.query(path: cacheEntry.path)
 
-        return query.element(boundBy: cacheEntry.index)
+        let element = query.element(boundBy: cacheEntry.index)
+        if Configuration.isScreenshottingElements {
+            XCTContext.runActivity(named: "snapshotting element") { activity in
+                let screenshot = element.screenshot()
+                activity.add(
+                    XCTAttachment(screenshot: screenshot)
+                )
+            }
+        }
+        if Configuration.isLoggingElements {
+            XCTContext.runActivity(named: "element log") { _ in
+                print(element.debugDescription)
+            }
+        }
+        return element
     }
 
     /// It is used for getting the window that contains the element

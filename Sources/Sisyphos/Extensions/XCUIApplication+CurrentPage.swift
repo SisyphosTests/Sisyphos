@@ -52,7 +52,7 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
             value: element.value as? String
         )
     case .secureTextField:
-        return TextField(
+        return SecureTextField(
             identifier: element.identifier,
             value: element.value as? String
         )

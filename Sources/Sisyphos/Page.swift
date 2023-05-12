@@ -77,6 +77,7 @@ public extension Page {
                 guard !currentResults.isExisting else { return }
                 results = currentResults
                 _ = runLoop.run(mode: .default, before: Date(timeIntervalSinceNow: 1))
+                handleInterruptions()
             } while Date() < deadline
 
             if let data = results?.actualPage?.generatePageSource().data(using: .utf8) {
@@ -123,5 +124,12 @@ private extension PageExistsResults {
         missingElements.map {
             "\n⛔️ missing element \(type(of: $0)), defined at \($0.elementIdentifier.file) \($0.elementIdentifier.line):\($0.elementIdentifier.line)"
         }.joined()
+    }
+}
+
+private extension Page {
+    /// Automatically handles system alerts like push notification permissions as well as user defined UI interruptions.
+    func handleInterruptions() {
+        UIInterruptionsObserver.shared.checkForInterruptions()
     }
 }

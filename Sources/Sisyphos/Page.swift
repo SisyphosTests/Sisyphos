@@ -45,6 +45,10 @@ public struct PageExistsResults {
 public extension Page {
     func exists() -> PageExistsResults {
         XCTContext.runActivity(named: "Check if page \(debugName) exists") { activity in
+            let screenshotAttachment = XCTAttachment(screenshot: xcuiapplication.screenshot())
+            screenshotAttachment.lifetime = .deleteOnSuccess
+            activity.add(screenshotAttachment)
+
             guard let snapshot = try? xcuiapplication.snapshot() else {
                 return PageExistsResults(
                     missingElements: body.elements,

@@ -21,20 +21,21 @@ extension XCTestCase {
             app = XCUIApplication()
         }
 
-        var lastIdentifier: String = ""
+        var lastSource = ""
         while true {
             RunLoop.current.run(until: Date(timeIntervalSinceNow: 1))
-            guard let snapshot = try? app.snapshot() else { continue }
-            let identifier = snapshot.find(elementType: .navigationBar)?.identifier ?? ""
-            guard identifier != lastIdentifier else { continue }
+            guard
+                let snapshot = try? app.snapshot(),
+                let page = app.currentPage
+            else { continue }
 
-            RunLoop.current.run(until: Date(timeIntervalSinceNow: 1))
-
-            guard let page = app.currentPage else { continue }
+            let identifier = snapshot.findFirstIdentifier() ?? "GeneratedPage"
+            let sourceWithoutUniqueName = page.generatePageSource(pageName: identifier)
+            guard lastSource != sourceWithoutUniqueName else { continue }
+            lastSource = sourceWithoutUniqueName
             appendToSourceFile(
                 addedContents: page.generatePageSource(pageName: identifier.generatePageName()) + "\n\n"
             )
-            lastIdentifier = identifier
         }
     }
 }
@@ -69,6 +70,19 @@ private extension XCUIElementSnapshot {
             if let element = child.find(elementType: elementType) {
                 return element
             }
+        }
+
+        return nil
+    }
+
+    /// Tries to find the first identifier in the element hierarchy that could be used as and identifier for the
+    /// page that is currently displayed.
+    func findFirstIdentifier() -> String? {
+        if let identifier = find(elementType: .navigationBar)?.identifier, !identifier.isEmpty {
+            return identifier
+        }
+        if let identifier = find(elementType: .other)?.identifier, !identifier.isEmpty {
+            return identifier
         }
 
         return nil

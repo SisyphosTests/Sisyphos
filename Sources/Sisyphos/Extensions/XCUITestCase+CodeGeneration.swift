@@ -7,6 +7,15 @@ extension XCTestCase {
         file: String = #file,
         line: UInt = #line
     ) {
+
+        #if !targetEnvironment(simulator)
+        print("⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️")
+        print("⚠️ You are running the code generation on a real device 📱")
+        print("⚠️ The code generation will not automatically add the")
+        print("⚠️ generated pages to the source file")
+        print("⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️")
+        #endif
+
         func appendToSourceFile(addedContents: String) {
             // TODO: Give the user a hint if things go wrong.
             let fileUrl = URL(fileURLWithPath: file)

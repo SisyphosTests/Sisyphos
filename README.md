@@ -1,7 +1,7 @@
 # Sisyphos - Declarative end-to-end and UI testing for iOS and macOS
 
 ![](https://img.shields.io/badge/platform-iOS%20%7C%20macOS-lightgrey)
-![](https://img.shields.io/badge/Swift-5.7%20%7C%205.6-brightgreen)
+![](https://img.shields.io/badge/Swift-5.7%20|%205.6%20|%205.7%20|%205.8%20|%205.9-brightgreen)
 
 Sisyphos uses a declarative syntax, 
 so you can simply state how the user interface of your app under test should look like. 
@@ -23,7 +23,7 @@ Let's say you want to write a test for the [Landmarks app](https://developer.app
 You want to test that it shows the correct featured lakes and that after tapping on one of the lakes, it will navigate
 to the correct page.
 
-| <img src="./Sources/Sisyphos/Documentation.docc/Resources/landsmark-app-homepage.png"> | <img src="./Sources/Sisyphos/Documentation.docc/Resources/landsmark-app-silversalmoncreek.png"> |
+| <img src="./Sources/Sisyphos/Documentation.docc/Resources/landsmark-app-homepage@3x.png"> | <img src="./Sources/Sisyphos/Documentation.docc/Resources/landsmark-app-silversalmoncreek@3x.png"> |
 |--------------------------------------------------------|-----------------------------------------------------------------|
 
 ```swift

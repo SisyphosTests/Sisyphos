@@ -2,6 +2,14 @@
 
 Declarative end-to-end and UI testing for iOS and macOS
 
+## Which problem does Sisyphos solve?
+
+Sisyphos enables you to write user interface tests in a declarative way and even with the support of automatic code
+generation based on the user interface of your running app.
+You don't need to write lots of imperative code to match elements or to validate screens.
+It significantly reduces the time that is needed for writing and maintaing user interface tests.
+Looking at tests written with Sisyphos will give you a precise idea how the user interface of the app looks like.
+
 ## Overview
 
 Sisyphos uses a declarative syntax, 
@@ -28,6 +36,7 @@ Please report any bugs or feature requests at its [GitHub project](https://githu
 
 - <doc:Integration>
 - <doc:WritingTests>
+- <doc:Interruptions>
 
 ### Page Elements
 

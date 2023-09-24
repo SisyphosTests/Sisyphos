@@ -406,6 +406,7 @@ extension PageElement {
         return application.query(path: cacheEntry.path)
     }
 
+    /// Sends a tap event to a hittable point the system computes for the element.
     public func tap() {
         guard let element = getXCUIElement(forAction: "tap()") else { return }
         element.waitUntilStablePosition()
@@ -413,22 +414,39 @@ extension PageElement {
     }
 
     public func tapAny() {
+        // TODO: It's worth thinking about to merge ``tapAny()`` and ``tap()``.
+        //   This method selects the first element and it's not possible to tap another occurrence of the element.
+        //   In the end, ``tap()`` also taps the first occurrence with the difference that the tests fail if there are
+        //   multiple elements. We could refactor `tap()` to handle multiple occurrences.
         guard let element = getAllXCUIElements(forAction: "tap()")?.firstMatch else { return }
         element.waitUntilStablePosition()
         element.tap()
     }
 
+    /// Sends a tap event to the hittable point that is described by the given normalized coordinate.
+    ///
     /// In the current scenarios, we observed that the static text element on the WebView is not hittable when the
     /// regular `tap()` function has been used. The reason is that XCUIElement recognizes the object as not accessible,
     /// but it's not true. To avoid non-accessible situations, we need to tap on the component by using offset
     /// coordinates.
-    /// - Parameter coordinates: Offset coordinates to specify tap position
+    /// - Parameter coordinates: Normalized offset coordinates to specify tap position.
     public func tap(usingCoordinates coordinates: CGVector) {
         guard let element = getXCUIElement(forAction: "tap()") else { return }
         element.waitUntilStablePosition()
         element.coordinate(withNormalizedOffset: coordinates).tap()
     }
 
+    /// Types a string into the element.
+    ///
+    /// The element doesn't need to have keyboard focus prior to typing. To make sure that the element has keyboard
+    /// focus, a tap event is sent to the element before typing.
+    ///
+    /// - Parameters:
+    ///   - text:
+    ///       The string which should be typed into the element.
+    ///   - dismissKeyboard:
+    ///       Whether or not the keyboard should be dismissed after typing the text has finished. If the keyboard should
+    ///       be dismissed, it's dismissed by tapping the `Done` button on the keyboard.
     public func type(text: String, dismissKeyboard: Bool = true) {
         // TODO: better activity description
         XCTContext.runActivity(named: "Typing text \(text.debugDescription)") { activity in

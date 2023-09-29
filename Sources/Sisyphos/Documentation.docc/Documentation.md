@@ -38,6 +38,7 @@ Please report any bugs or feature requests at its [GitHub project](https://githu
 - ``NavigationBar``
 - ``SecureTextField``
 - ``StaticText``
+- ``Switch``
 - ``TabBar``
 - ``TextField``
 

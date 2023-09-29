@@ -33,6 +33,11 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
             identifier: element.identifier,
             label: element.label
         )
+    case .switch:
+        return Switch(
+            identifier: element.identifier,
+            label: element.label
+        )
     case .tabBar:
         return TabBar(
             elements: element.children.flatMap(flatten(element:))

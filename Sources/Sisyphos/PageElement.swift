@@ -338,20 +338,20 @@ extension PageElement {
     func getXCUIElement(forAction action: String) -> XCUIElement? {
         handleInterruptions()
 
-        guard let cacheEntry = elementCache[elementIdentifier] else {
+        guard let cacheEntry = elementPathCache[elementIdentifier] else {
             assertionFailure("\(action) called before page.exists()!")
             return nil
         }
         cacheEntry.page.refreshElementCache()
-        guard let cacheEntry = elementCache[elementIdentifier] else {
-            assertionFailure("\(action) called before page.exists()!")
+        guard let location = cacheEntry.location else {
+            assertionFailure("Try to run \(action) on an element of a non-existing page")
             return nil
         }
 
         let application = cacheEntry.page.xcuiapplication
-        let query = application.query(path: cacheEntry.path)
+        let query = application.query(path: location.path)
 
-        return query.element(boundBy: cacheEntry.index)
+        return query.element(boundBy: location.index)
     }
 
     /// It is used for getting the window that contains the element
@@ -359,29 +359,29 @@ extension PageElement {
     func getXCUIWindow(forAction action: String) -> XCUIElement? {
         handleInterruptions()
 
-        guard let cacheEntry = elementCache[elementIdentifier] else {
+        guard let cacheEntry = elementPathCache[elementIdentifier] else {
             assertionFailure("\(action) called before page.exists()!")
             return nil
         }
         cacheEntry.page.refreshElementCache()
-        guard let cacheEntry = elementCache[elementIdentifier] else {
-            assertionFailure("\(action) called before page.exists()!")
+        guard let location = cacheEntry.location else {
+            assertionFailure("Try to run \(action) on an element of a non-existing page")
             return nil
         }
 
         let application = cacheEntry.page.xcuiapplication
         guard
-            let windowIndex = cacheEntry.path.firstIndex(where: { $0.elementType == .window })
+            let windowIndex = location.path.firstIndex(where: { $0.elementType == .window })
         else {
             return nil
         }
-        let query = application.query(path: Array(cacheEntry.path[0...windowIndex]))
+        let query = application.query(path: Array(location.path[0...windowIndex]))
 
         return query.element.firstMatch
     }
 
     private func getPage() -> Page? {
-        guard let cacheEntry = elementCache[elementIdentifier] else {
+        guard let cacheEntry = elementPathCache[elementIdentifier] else {
             return nil
         }
 
@@ -391,19 +391,19 @@ extension PageElement {
     func getAllXCUIElements(forAction action: String) -> XCUIElementQuery? {
         handleInterruptions()
 
-        guard let cacheEntry = elementCache[elementIdentifier] else {
+        guard let cacheEntry = elementPathCache[elementIdentifier] else {
             assertionFailure("\(action) called before page.exists()!")
             return nil
         }
         cacheEntry.page.refreshElementCache()
-        guard let cacheEntry = elementCache[elementIdentifier] else {
-            assertionFailure("\(action) called before page.exists()!")
+        guard let location = cacheEntry.location else {
+            assertionFailure("Try to run \(action) on an element of a non-existing page")
             return nil
         }
 
         let application = cacheEntry.page.xcuiapplication
 
-        return application.query(path: cacheEntry.path)
+        return application.query(path: location.path)
     }
 
     /// Sends a tap event to a hittable point the system computes for the element.

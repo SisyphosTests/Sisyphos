@@ -27,7 +27,7 @@ struct Snapshot {
         identifier = xcuisnapshot.identifier
         label = xcuisnapshot.label
         value = xcuisnapshot.value as? String
-        children = xcuisnapshot.children.enumerated().map { index, child in
+        children = xcuisnapshot.children.map { child in
             Snapshot(
                 xcuisnapshot: child,
                 counter: counter,
@@ -90,6 +90,7 @@ class ElementFinder {
         var missingElements: [PageElement] = []
         var indexOfPreviousElement: UInt = 0
         for element in page.body.elements {
+            registerElement(element: element)
             guard let result = find(element: element, after: indexOfPreviousElement, in: snapshot) else {
                 missingElements.append(element)
                 continue
@@ -98,6 +99,15 @@ class ElementFinder {
         }
 
         return missingElements
+    }
+
+    private func registerElement(element: PageElement) {
+        elementPathCache[element.elementIdentifier] = CacheEntry(page: page, location: nil)
+        if let hasChildren = element as? HasChildren {
+            for child in hasChildren.elements {
+                registerElement(element: child)
+            }
+        }
     }
 
     private func find(element: PageElement, after elementIndex: UInt, in snapshot: Snapshot) -> Snapshot? {
@@ -115,9 +125,15 @@ class ElementFinder {
 
             if paths.contains(snapshot.path) {
                 let index = paths.filter { $0 == snapshot.path }.count
-                elementCache[element.elementIdentifier] = .init(page: page, path: snapshot.path, index: index)
+                elementPathCache[element.elementIdentifier] = .init(
+                    page: page,
+                    location: .init(path: snapshot.path, index: index)
+                )
             } else {
-                elementCache[element.elementIdentifier] = .init(page: page, path: snapshot.path, index: 0)
+                elementPathCache[element.elementIdentifier] = .init(
+                    page: page,
+                    location: .init(path: snapshot.path, index: 0)
+                )
             }
             paths.append(snapshot.path)
 

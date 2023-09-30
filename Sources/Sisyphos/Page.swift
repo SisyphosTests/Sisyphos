@@ -141,12 +141,16 @@ extension Page {
     }
 }
 
-var elementCache: [PageElementIdentifier: CacheEntry] = [:]
+var elementPathCache: [PageElementIdentifier: CacheEntry] = [:]
 
 struct CacheEntry {
     let page: Page
-    let path: [Snapshot.PathStep]
-    let index: Int
+    let location: LocationInTree?
+
+    struct LocationInTree {
+        let path: [Snapshot.PathStep]
+        let index: Int
+    }
 }
 
 

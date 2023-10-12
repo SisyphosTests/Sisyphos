@@ -115,6 +115,17 @@ extension PageElement {
         element.coordinate(withNormalizedOffset: coordinates).tap()
     }
 
+    /// Sends a tap event to the hittable point that is described by the given intrinsic coordinate.
+    /// - Parameter point: An intrinsic coordinate that would like to be tapped in the element.
+    public func tap(usingPosition point: CGPoint) {
+        guard let element = getXCUIElement(forAction: "tap()") else { return }
+        element.waitUntilStablePosition()
+        element
+            .coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0))
+            .withOffset(CGVector(dx: point.x, dy: point.y))
+            .tap()
+    }
+
     /// Types a string into the element.
     ///
     /// The element doesn't need to have keyboard focus prior to typing. To make sure that the element has keyboard

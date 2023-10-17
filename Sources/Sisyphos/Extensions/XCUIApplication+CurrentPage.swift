@@ -61,6 +61,12 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
             identifier: element.identifier,
             value: element.value as? String
         )
+    case .other:
+        if element.label == "Appboy Slideup" {
+            // Made it conditional to not handle all the elements in the **other* type as they are many more.
+            return BrazeOverlay()
+        }
+        return nil
     default:
         return nil
     }

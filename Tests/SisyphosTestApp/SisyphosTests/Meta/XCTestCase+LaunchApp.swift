@@ -19,8 +19,15 @@ extension XCTestCase {
         file: StaticString = #file,
         line: UInt = #line
     ) -> XCUIApplication {
+        let rootDirectory = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .path
+        let fileString = String(describing: file)
+        guard fileString.hasPrefix(rootDirectory) else { preconditionFailure() }
         let app = XCUIApplication()
-        app.launchArguments = [String(describing: file), String(line)]
+        app.launchArguments = [String(fileString.dropFirst(rootDirectory.count)), String(line)]
         app.launch()
 
         return app

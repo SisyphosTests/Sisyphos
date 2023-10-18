@@ -4,7 +4,7 @@ import Photos
 
 
 func registerTestViews() {
-   collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/PageHierarchyTests.swift", line: 8) {
+   collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 8) {
     
             TabView {
                 NavigationStack {
@@ -29,7 +29,7 @@ func registerTestViews() {
             }
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/PageHierarchyTests.swift", line: 66) {
+collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 66) {
     
             TabView {
                 NavigationStack {
@@ -54,52 +54,52 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             }
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/PageHierarchyTests.swift", line: 108) {
+collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 108) {
     
             Text("First Text")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/PageHierarchyTests.swift", line: 127) {
+collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 127) {
     
             Text("First Text")
             Text("Conditional Second Text")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/PageHierarchyTests.swift", line: 135) {
+collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 135) {
     
             Text("First Text")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/PageHierarchyTests.swift", line: 153) {
-    
-            Text("First Text")
-            Text("Second Text")
-        
-}
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/PageHierarchyTests.swift", line: 162) {
+collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 153) {
     
             Text("First Text")
             Text("Second Text")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/PageHierarchyTests.swift", line: 182) {
+collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 162) {
+    
+            Text("First Text")
+            Text("Second Text")
+        
+}
+collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 182) {
     
             Text("First Text")
             Text("Alternative Second Text")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/SwitchTests.swift", line: 8) {
+collect(fileName: "/SisyphosTests/SwitchTests.swift", line: 8) {
     
             Toggle("Some Toggle", isOn: binding(initialValue: false))
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/SwitchTests.swift", line: 22) {
+collect(fileName: "/SisyphosTests/SwitchTests.swift", line: 22) {
     
             Toggle("", isOn: binding(initialValue: false))
                 .accessibilityIdentifier("the_switch")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/CollectionViewTests.swift", line: 8) {
+collect(fileName: "/SisyphosTests/CollectionViewTests.swift", line: 8) {
     
             List {
                 Text("First Cell")
@@ -111,29 +111,29 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             }
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/StaticTextTests.swift", line: 8) {
+collect(fileName: "/SisyphosTests/StaticTextTests.swift", line: 8) {
     
             Text("Hello")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/StaticTextTests.swift", line: 22) {
+collect(fileName: "/SisyphosTests/StaticTextTests.swift", line: 22) {
     
             Text("Hello")
                 .accessibilityIdentifier("the_text")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/SecureTextFieldTests.swift", line: 8) {
+collect(fileName: "/SisyphosTests/SecureTextFieldTests.swift", line: 8) {
     
             SecureField("Enter password", text: binding(initialValue: ""))
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/SecureTextFieldTests.swift", line: 22) {
+collect(fileName: "/SisyphosTests/SecureTextFieldTests.swift", line: 22) {
     
             SecureField("Enter password", text: binding(initialValue: ""))
                 .accessibilityIdentifier("the_securefield")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/InterruptionTests.swift", line: 17) {
+collect(fileName: "/SisyphosTests/InterruptionTests.swift", line: 17) {
     
             Button(action: {
                 UIApplication.shared.accessibilityLabel = "Button was pressed"
@@ -152,7 +152,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             )
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/InterruptionTests.swift", line: 66) {
+collect(fileName: "/SisyphosTests/InterruptionTests.swift", line: 66) {
     
             Button(action: {
                 UIApplication.shared.accessibilityLabel = "Button was pressed"
@@ -164,7 +164,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             }
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/InterruptionTests.swift", line: 97) {
+collect(fileName: "/SisyphosTests/InterruptionTests.swift", line: 97) {
     
             Text("Test for denying")
                 .onAppear {
@@ -174,7 +174,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
                 }
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/InterruptionTests.swift", line: 112) {
+collect(fileName: "/SisyphosTests/InterruptionTests.swift", line: 112) {
     
             Text("Test for denying")
                 .onAppear {
@@ -184,7 +184,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
                 }
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/NavigationBarTests.swift", line: 9) {
+collect(fileName: "/SisyphosTests/NavigationBarTests.swift", line: 9) {
     
             NavigationStack {
                 Text("Welcome!")
@@ -192,7 +192,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             }
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/NavigationBarTests.swift", line: 28) {
+collect(fileName: "/SisyphosTests/NavigationBarTests.swift", line: 28) {
     
             NavigationStack(path: binding(initialValue: [1, 2, 3, 4])) {
                 Group {
@@ -208,7 +208,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             }
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/AlertTests.swift", line: 8) {
+collect(fileName: "/SisyphosTests/AlertTests.swift", line: 8) {
     
             Text("App")
             .alert(
@@ -223,7 +223,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             )
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/ButtonTests.swift", line: 8) {
+collect(fileName: "/SisyphosTests/ButtonTests.swift", line: 8) {
     
             SwiftUI.Button(action: {}) {
                 Text("Some Button")
@@ -231,7 +231,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             .accessibilityIdentifier("some_button")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/ButtonTests.swift", line: 25) {
+collect(fileName: "/SisyphosTests/ButtonTests.swift", line: 25) {
     
             SwiftUI.Button(action: {}) {
                 Text("Some Button")
@@ -239,7 +239,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             .accessibilityIdentifier("some_button")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/ButtonTests.swift", line: 42) {
+collect(fileName: "/SisyphosTests/ButtonTests.swift", line: 42) {
     
             SwiftUI.Button(action: {}) {
                 Text("Some Button")
@@ -247,7 +247,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             .accessibilityIdentifier("some_button")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/ButtonTests.swift", line: 59) {
+collect(fileName: "/SisyphosTests/ButtonTests.swift", line: 59) {
     
             SwiftUI.Button(action: {
                 UIApplication.shared.accessibilityLabel = "Button tapped"
@@ -261,39 +261,39 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             }
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/PageExistsErrorTests.swift", line: 8) {
+collect(fileName: "/SisyphosTests/PageExistsErrorTests.swift", line: 8) {
     
             Text("Text")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/PageExistsErrorTests.swift", line: 24) {
+collect(fileName: "/SisyphosTests/PageExistsErrorTests.swift", line: 24) {
     
             Text("Text")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/TestDataTests.swift", line: 8) {
+collect(fileName: "/SisyphosTests/TestDataTests.swift", line: 8) {
     
             Text("Test: Some Value")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/TestDataTests.swift", line: 26) {
+collect(fileName: "/SisyphosTests/TestDataTests.swift", line: 26) {
     
             SwiftUI.Button("Buy now for 7.77 EUR", action: {})
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/TextFieldTests.swift", line: 9) {
+collect(fileName: "/SisyphosTests/TextFieldTests.swift", line: 9) {
     
             SwiftUI.TextField("Enter text", text: appValueBinding())
                 .accessibilityIdentifier("the_textfield")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/TextFieldTests.swift", line: 24) {
+collect(fileName: "/SisyphosTests/TextFieldTests.swift", line: 24) {
     
             SwiftUI.TextField("Enter text", text: binding(initialValue: "Some Value"))
                 .accessibilityIdentifier("the_textfield")
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/TextFieldTests.swift", line: 39) {
+collect(fileName: "/SisyphosTests/TextFieldTests.swift", line: 39) {
     
             Text("Some Text")
             SwiftUI.TextField("Enter text", text: appValueBinding())
@@ -301,17 +301,17 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             Button("Some button", action: {})
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/TextFieldTests.swift", line: 56) {
+collect(fileName: "/SisyphosTests/TextFieldTests.swift", line: 56) {
     
             SwiftUI.TextField("Enter text", text: appValueBinding())
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/TextFieldTests.swift", line: 76) {
+collect(fileName: "/SisyphosTests/TextFieldTests.swift", line: 76) {
     
             SwiftUI.TextField("Enter text", text: appValueBinding())
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/TabBarTests.swift", line: 9) {
+collect(fileName: "/SisyphosTests/TabBarTests.swift", line: 9) {
     
             TabView {
                 Text("First Screen")
@@ -325,7 +325,7 @@ collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTe
             }
         
 }
-collect(fileName: "/Users/lu.stuehrk/projects/Sisyphos/Sisyphos/Tests/SisyphosTestApp/SisyphosTests/TabBarTests.swift", line: 36) {
+collect(fileName: "/SisyphosTests/TabBarTests.swift", line: 36) {
     
             TabView {
                 Text("First Screen")

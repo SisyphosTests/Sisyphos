@@ -130,7 +130,7 @@ struct Parser {
                 }
                 generatedCode.append(
                 """
-                collect(fileName: "\(fileUrl.path)", line: \(start)) {
+                collect(fileName: "\(fileUrl.path.deletingPrefix(directory.path))", line: \(start)) {
                     \(String(currentViewSource))
                 }
 
@@ -150,3 +150,12 @@ struct Parser {
     }
 }
 
+extension String {
+    func deletingPrefix(_ prefix: String) -> String {
+        guard self.hasPrefix(prefix) else {
+            assertionFailure()
+            return self
+        }
+        return String(self.dropFirst(prefix.count))
+    }
+}

@@ -1,8 +1,8 @@
-public struct BrazeOverlay: PageElement {
+public struct OtherElement: PageElement {
     public let elementIdentifier: PageElementIdentifier
 
-    let label: String
     let identifier: String?
+    let label: String?
 
     public var queryIdentifier: QueryIdentifier {
         .init(
@@ -15,12 +15,14 @@ public struct BrazeOverlay: PageElement {
     }
 
     public init(
+        identifier: String? = nil,
+        label: String? = nil,
         file: String = #file,
         line: UInt = #line,
         column: UInt = #column
     ) {
         self.elementIdentifier = .init(file: file, line: line, column: column)
-        self.label = "Appboy Slideup"
-        self.identifier = nil
+        self.label = label
+        self.identifier = identifier
     }
 }

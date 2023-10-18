@@ -61,12 +61,13 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
             identifier: element.identifier,
             value: element.value as? String
         )
-    case .other:
-        if element.label == "Appboy Slideup" {
-            // Made it conditional to not handle all the elements in the **other* type as they are many more.
-            return BrazeOverlay()
-        }
-        return nil
+    case .other where !element.label.isEmpty || !element.identifier.isEmpty:
+        // Made it conditional to not handle all the elements in the **other* type as they are many,
+        // and to avoid noise.
+        return OtherElement(
+            identifier: element.identifier,
+            label: element.label
+        )
     default:
         return nil
     }

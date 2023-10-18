@@ -122,6 +122,14 @@ collect(fileName: "/SisyphosTests/StaticTextTests.swift", line: 22) {
                 .accessibilityIdentifier("the_text")
         
 }
+collect(fileName: "/SisyphosTests/OtherElementTests.swift", line: 8) {
+    
+            Color.green
+                .frame(width: 100, height: 100, alignment: .center)
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("Identifier")
+        
+}
 collect(fileName: "/SisyphosTests/SecureTextFieldTests.swift", line: 8) {
     
             SecureField("Enter password", text: binding(initialValue: ""))

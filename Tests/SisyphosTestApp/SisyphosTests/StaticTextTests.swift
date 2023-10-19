@@ -31,5 +31,20 @@ final class StaticTextTests: XCTestCase {
         }
         let expectedPage = ExpectedPage()
         expectedPage.waitForExistence()
+    } 
+
+    func testStaticTextOnlyIdentifiedByIdentifier() {
+        launchTestApp {
+            Text("Hello")
+                .accessibilityIdentifier("the_text")
+        }
+
+        struct ExpectedPage: Page {
+            var body: PageDescription {
+                StaticText(identifier: "the_text")
+            }
+        }
+        let expectedPage = ExpectedPage()
+        expectedPage.waitForExistence()
     }
 }

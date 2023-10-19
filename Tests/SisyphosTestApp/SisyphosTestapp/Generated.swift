@@ -4,7 +4,29 @@ import Photos
 
 
 func registerTestViews() {
-   collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 8) {
+   collect(fileName: "/SisyphosTests/OtherTests.swift", line: 8) {
+    
+            Color.green
+                .frame(width: 100, height: 100, alignment: .center)
+                .accessibilityIdentifier("Identifier")
+        
+}
+collect(fileName: "/SisyphosTests/OtherTests.swift", line: 24) {
+    
+            Color.green
+                .frame(width: 100, height: 100, alignment: .center)
+                .accessibilityLabel("Label")
+        
+}
+collect(fileName: "/SisyphosTests/OtherTests.swift", line: 40) {
+    
+            Color.green
+                .frame(width: 100, height: 100, alignment: .center)
+                .accessibilityLabel("Label")
+                .accessibilityIdentifier("Identifier")
+        
+}
+collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 8) {
     
             TabView {
                 NavigationStack {

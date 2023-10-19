@@ -61,6 +61,13 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
             identifier: element.identifier,
             value: element.value as? String
         )
+    case .other where !element.label.isEmpty || !element.identifier.isEmpty:
+        // Made it conditional to not handle all the elements in the **other* type as they are many,
+        // and to avoid noise.
+        return Other(
+            label: element.label, 
+            identifier: element.identifier
+        )
     default:
         return nil
     }

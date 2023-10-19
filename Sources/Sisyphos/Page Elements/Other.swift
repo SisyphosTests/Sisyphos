@@ -1,4 +1,4 @@
-public struct OtherElement: PageElement {
+public struct Other: PageElement {
     public let elementIdentifier: PageElementIdentifier
 
     let identifier: String?
@@ -15,14 +15,25 @@ public struct OtherElement: PageElement {
     }
 
     public init(
+        label: String,
         identifier: String? = nil,
-        label: String? = nil,
         file: String = #file,
         line: UInt = #line,
         column: UInt = #column
     ) {
         self.elementIdentifier = .init(file: file, line: line, column: column)
-        self.label = label
         self.identifier = identifier
+        self.label = label
+    }
+
+    public init(
+        identifier: String,
+        file: String = #file,
+        line: UInt = #line,
+        column: UInt = #column
+    ) {
+        self.elementIdentifier = .init(file: file, line: line, column: column)
+        self.identifier = identifier
+        self.label = nil
     }
 }

@@ -64,9 +64,9 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
     case .other where !element.label.isEmpty || !element.identifier.isEmpty:
         // Made it conditional to not handle all the elements in the **other* type as they are many,
         // and to avoid noise.
-        return OtherElement(
-            identifier: element.identifier,
-            label: element.label
+        return Other(
+            label: element.label, 
+            identifier: element.identifier
         )
     default:
         return nil

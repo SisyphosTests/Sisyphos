@@ -26,6 +26,15 @@ collect(fileName: "/SisyphosTests/OtherTests.swift", line: 40) {
                 .accessibilityIdentifier("Identifier")
         
 }
+collect(fileName: "/SisyphosTests/OtherTests.swift", line: 57) {
+    
+            VStack {
+                Text("Some Text")
+            }
+            .accessibilityElement()
+            .accessibilityIdentifier("Stack")
+        
+}
 collect(fileName: "/SisyphosTests/PageHierarchyTests.swift", line: 8) {
     
             TabView {

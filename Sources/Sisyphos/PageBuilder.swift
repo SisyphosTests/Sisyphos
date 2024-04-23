@@ -29,6 +29,12 @@
     }
 }
 
+public extension PageBuilder {
+    static var empty: () -> PageDescription {
+        { PageDescription(elements: []) }
+    }
+}
+
 
 public protocol PageDescriptionBlock {
     var buildingBlocks: [PageElement] { get }

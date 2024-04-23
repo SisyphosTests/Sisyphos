@@ -46,7 +46,27 @@ final class OtherTests: XCTestCase {
 
         struct ExpectedPage: Page {
             var body: PageDescription {
-                Other(label: "Label", identifier: "Identifier")
+                Other(identifier: "Identifier", label: "Label")
+            }
+        }
+        let expectedPage = ExpectedPage()
+        expectedPage.waitForExistence()
+    }
+
+    func testOtherElementWithChildren() {
+        launchTestApp {
+            VStack {
+                Text("Some Text")
+            }
+            .accessibilityElement()
+            .accessibilityIdentifier("Stack")
+        }
+
+        struct ExpectedPage: Page {
+            var body: PageDescription {
+                Other(identifier: "Stack") {
+                    StaticText("Some Text")
+                }
             }
         }
         let expectedPage = ExpectedPage()

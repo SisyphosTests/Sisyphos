@@ -61,12 +61,13 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
             identifier: element.identifier,
             value: element.value as? String
         )
+    // Usually, there are a lot of `Other` elements which produce a lot of visual noise.
+    // Because of that, we only include them if they have either a label or an identifier.
     case .other where !element.label.isEmpty || !element.identifier.isEmpty:
-        // Made it conditional to not handle all the elements in the **other* type as they are many,
-        // and to avoid noise.
         return Other(
-            label: element.label, 
-            identifier: element.identifier
+            identifier: element.identifier,
+            label: element.label,
+            elements: element.children.flatMap(flatten(element:))
         )
     default:
         return nil

@@ -5,8 +5,15 @@ public struct PageDescription {
 }
 
 extension PageDescription {
-    public func generatePageSource(pageName: String = "DebugPage") -> String {
-        var output = "struct \(pageName): Page {\n  var body: PageDescription {\n"
+    public func generatePageSource(
+        pageName: String = "DebugPage",
+        applicationName: String? = nil
+    ) -> String {
+        var output = "struct \(pageName): Page {\n"
+        if let applicationName {
+            output += "\n  let application = \(applicationName.debugDescription)\n\n"
+        }
+        output += "  var body: PageDescription {\n"
         for element in elements {
             output += element.prettyPrint(indentation: 2) + "\n"
         }

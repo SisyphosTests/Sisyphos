@@ -39,11 +39,11 @@ extension XCTestCase {
             else { continue }
 
             let identifier = snapshot.findFirstIdentifier() ?? "GeneratedPage"
-            let sourceWithoutUniqueName = page.generatePageSource(pageName: identifier)
+            let sourceWithoutUniqueName = page.generatePageSource(pageName: identifier, applicationName: application)
             guard lastSource != sourceWithoutUniqueName else { continue }
             lastSource = sourceWithoutUniqueName
             appendToSourceFile(
-                addedContents: page.generatePageSource(pageName: identifier.generatePageName()) + "\n\n"
+                addedContents: sourceWithoutUniqueName + "\n\n"
             )
         }
     }

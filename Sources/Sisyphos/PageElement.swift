@@ -251,18 +251,7 @@ extension XCUIApplication {
     func query(path: [Snapshot.PathStep]) -> XCUIElementQuery {
         var usedQuery: ChildrenQueryProvider = self
         for step in path[1...] { // First step is always the application itself, so we skip it.
-            guard step.elementType != .other else { continue }
-            usedQuery = usedQuery.descendants(matching: step.elementType).matching(NSPredicate(block: { [step] object, _ in
-                guard let snapshot = object as? XCUIElementAttributes else {
-                    assertionFailure()
-                    return false
-                }
-                return
-                    snapshot.elementType == step.elementType
-                    && snapshot.identifier == step.identifier
-                    && snapshot.label.matches(searchedLabel: step.label)
-                    && snapshot.value as? String == step.value
-            }))
+            usedQuery = usedQuery.descendants(matching: step.elementType).matching(NSPredicate(step: step))
         }
 
         return usedQuery as! XCUIElementQuery

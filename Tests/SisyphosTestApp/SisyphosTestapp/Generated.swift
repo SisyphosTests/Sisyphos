@@ -150,10 +150,20 @@ collect(fileName: "/SisyphosTests/StaticTextTests.swift", line: 8) {
 collect(fileName: "/SisyphosTests/StaticTextTests.swift", line: 22) {
     
             Text("Hello")
+        
+}
+collect(fileName: "/SisyphosTests/StaticTextTests.swift", line: 36) {
+    
+            Text("Hello")
                 .accessibilityIdentifier("the_text")
         
 }
-collect(fileName: "/SisyphosTests/StaticTextTests.swift", line: 37) {
+collect(fileName: "/SisyphosTests/StaticTextTests.swift", line: 44) {
+    
+            Text("Hello")
+        
+}
+collect(fileName: "/SisyphosTests/StaticTextTests.swift", line: 58) {
     
             Text("Hello")
                 .accessibilityIdentifier("the_text")

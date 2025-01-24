@@ -21,7 +21,6 @@ final class StaticTextTests: XCTestCase {
     func testStaticTextAdditionallyIdentifiedByIdentifier() {
         launchTestApp {
             Text("Hello")
-                .accessibilityIdentifier("the_text")
         }
 
         struct ExpectedPage: Page {
@@ -30,13 +29,20 @@ final class StaticTextTests: XCTestCase {
             }
         }
         let expectedPage = ExpectedPage()
+        XCTExpectFailure("The identifier is missing in the test app") {
+            expectedPage.waitForExistence(timeout: 2)
+        }
+
+        launchTestApp {
+            Text("Hello")
+                .accessibilityIdentifier("the_text")
+        }
         expectedPage.waitForExistence()
     } 
 
     func testStaticTextOnlyIdentifiedByIdentifier() {
         launchTestApp {
             Text("Hello")
-                .accessibilityIdentifier("the_text")
         }
 
         struct ExpectedPage: Page {
@@ -45,6 +51,14 @@ final class StaticTextTests: XCTestCase {
             }
         }
         let expectedPage = ExpectedPage()
+        XCTExpectFailure("The identifier is missing in the test app") {
+            expectedPage.waitForExistence(timeout: 2)
+        }
+
+        launchTestApp {
+            Text("Hello")
+                .accessibilityIdentifier("the_text")
+        }
         expectedPage.waitForExistence()
     }
 }

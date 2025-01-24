@@ -7,7 +7,7 @@ public struct StaticText: PageElement {
     public var queryIdentifier: QueryIdentifier {
         .init(
             elementType: .staticText,
-            identifier: nil,
+            identifier: identifier,
             label: text,
             value: nil,
             descendants: []

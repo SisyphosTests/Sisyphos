@@ -89,6 +89,9 @@ extension PageElement {
     public func tap() {
         guard let element = getXCUIElement(forAction: "tap()") else { return }
         element.waitUntilStablePosition()
+        if !element.waitForExistence(timeout: 2.0) {
+            print("⚠️ Element does not exist")
+        }
         element.tap()
     }
 

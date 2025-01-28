@@ -22,7 +22,9 @@ extension XCUIElement {
     }
 
     func getFrame() -> CGRect {
-        guard self.exists else { return .zero }
+        guard self.waitForExistence(timeout: 0.1) else {
+            return .zero
+        }
 
         return frame
     }

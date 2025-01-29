@@ -30,6 +30,8 @@ extension PageElement {
         let application = cacheEntry.page.xcuiapplication
         let query = application.query(path: location.path)
 
+        print(cacheEntry.location!.path)
+        print("query", query.debugDescription, query.count)
         return query.element(boundBy: location.index)
     }
 

@@ -102,8 +102,9 @@ extension PageElement {
 
             guard dismissKeyboard else { return }
 
-            guard let toolbars = getPage()?.xcuiapplication.toolbars, toolbars.count > 0 else { return }
-            let dismissButton = toolbars.firstMatch.buttons["Done".localizedForSimulator]
+            guard let dismissButton = getPage()?.xcuiapplication.keyboards.buttons["Done".localizedForSimulator] else {
+                return
+            }
             guard dismissButton.exists else { return }
             // If this is a fresh simulator - which is very common on CI systems - then there's an overlay over the
             // keyboard which explains how to use the swipe keyboard. All of the buttons of the keyboard and its
@@ -118,7 +119,9 @@ extension PageElement {
                     break
                 }
             }
-            dismissButton.tap()
+            if dismissButton.isHittable {
+                dismissButton.tap()
+            }
         }
     }
 

@@ -1,11 +1,9 @@
 import XCTest
 
 
-class ElementFinder {
+final class ElementFinder {
     let snapshot: Snapshot
     let page: Page
-
-    var paths: [[Snapshot.PathStep]] = []
 
     init(page: Page, snapshot: XCUIElementSnapshot) {
         self.page = page
@@ -28,7 +26,7 @@ class ElementFinder {
     }
 
     private func registerElement(element: PageElement) {
-        elementPathCache[element.elementIdentifier] = CacheEntry(page: page, location: nil)
+        elementPathCache[element.elementIdentifier] = CacheEntry(page: page, snapshot: nil)
         if let hasChildren = element as? HasChildren {
             for child in hasChildren.elements {
                 registerElement(element: child)
@@ -49,19 +47,10 @@ class ElementFinder {
                 }
             }
 
-            if paths.contains(snapshot.path) {
-                let index = paths.filter { $0 == snapshot.path }.count
-                elementPathCache[element.elementIdentifier] = .init(
-                    page: page,
-                    location: .init(path: snapshot.path, index: index)
-                )
-            } else {
-                elementPathCache[element.elementIdentifier] = .init(
-                    page: page,
-                    location: .init(path: snapshot.path, index: 0)
-                )
-            }
-            paths.append(snapshot.path)
+            elementPathCache[element.elementIdentifier] = .init(
+                page: page,
+                snapshot: snapshot.xcuisnapshot
+            )
 
             return snapshot
         }

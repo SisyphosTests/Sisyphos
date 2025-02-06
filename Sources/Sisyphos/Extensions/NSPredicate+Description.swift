@@ -2,35 +2,22 @@ import XCTest
 
 
 extension NSPredicate {
-    convenience init(step: Snapshot.PathStep) {
+    convenience init(snapshot: XCUIElementSnapshot) {
         assert(Thread.isMainThread)
 
-        self.init(block: { object, _ in
-            guard let snapshot = object as? XCUIElementAttributes else {
-                assertionFailure()
-                return false
-            }
-            return snapshot.elementType == step.elementType
-              && snapshot.identifier == step.identifier
-              && snapshot.label.matches(searchedLabel: step.label)
-              && snapshot.value as? String == step.value
+        self.init(block: { element, _ in
+            guard let elementSnapshot = element as? XCUIElementSnapshot else { return false }
+            return snapshot.matches(snapshot: elementSnapshot)
         })
 
-        stepByPredicate.setObject(Box(value: step), forKey: self)
+        snapshotByPredicate.setObject(snapshot, forKey: self)
     }
 }
 
-/// A mapping where the key is a predicate that was created by Sisyphos and the value is the corresponding step in a
-/// snapshot path. This is needed so we can provide useful output in the test reports.
-private var stepByPredicate: NSMapTable<NSPredicate, Box<Snapshot.PathStep>> = NSMapTable.weakToStrongObjects()
-
-private final class Box<Value> {
-    let value: Value
-
-    init(value: Value) {
-        self.value = value
-    }
-}
+/// A mapping where the key is a predicate that was created by Sisyphos and the value is the corresponding element
+/// snapshot that is used for matching in the predicate. This is needed so we can provide useful output in the test
+/// reports.
+private var snapshotByPredicate: NSMapTable<NSPredicate, XCUIElementSnapshot> = NSMapTable.weakToStrongObjects()
 
 
 extension NSPredicate {
@@ -51,17 +38,17 @@ extension NSPredicate {
     /// not created by Sisyphos, then it falls back to the default description of NSPredicate.
     @_dynamicReplacement(for: description)
     var sisyphosDescription: String {
-        guard let step = stepByPredicate.object(forKey: self)?.value else { return super.description }
+        guard let snapshot = snapshotByPredicate.object(forKey: self) else { return super.description }
         var attributes: [String] = [
-            "element=\(step.elementType)",
+            "element=\(snapshot.elementType)",
         ]
-        if !step.identifier.isEmpty {
-            attributes.append("identifier=\(step.identifier.debugDescription)")
+        if !snapshot.identifier.isEmpty {
+            attributes.append("identifier=\(snapshot.identifier.debugDescription)")
         }
-        if !step.label.isEmpty {
-            attributes.append("label=\(step.label.debugDescription)")
+        if !snapshot.label.isEmpty {
+            attributes.append("label=\(snapshot.label.debugDescription)")
         }
-        if let value = step.value {
+        if let value = snapshot.value as? String {
             attributes.append("value=\(value.debugDescription)")
         }
 

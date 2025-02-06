@@ -145,12 +145,7 @@ var elementPathCache: [PageElementIdentifier: CacheEntry] = [:]
 
 struct CacheEntry {
     let page: Page
-    let location: LocationInTree?
-
-    struct LocationInTree {
-        let path: [Snapshot.PathStep]
-        let index: Int
-    }
+    let snapshot: XCUIElementSnapshot?
 }
 
 

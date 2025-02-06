@@ -17,20 +17,20 @@ extension PageElement {
     func getXCUIElement(forAction action: String) -> XCUIElement? {
         handleInterruptions()
 
+        getPage()?.refreshElementCache()
         guard let cacheEntry = elementPathCache[elementIdentifier] else {
             assertionFailure("\(action) called before page.exists()!")
             return nil
         }
-        cacheEntry.page.refreshElementCache()
-        guard let location = cacheEntry.location else {
+        guard let snapshot = cacheEntry.snapshot else {
             assertionFailure("Try to run \(action) on an element of a non-existing page")
             return nil
         }
 
         let application = cacheEntry.page.xcuiapplication
-        let query = application.query(path: location.path)
+        let query = application.descendants(matching: snapshot.elementType).matching(NSPredicate(snapshot: snapshot))
 
-        return query.element(boundBy: location.index)
+        return query.firstMatch
     }
 
     /// It is used for getting the window that contains the element
@@ -38,25 +38,19 @@ extension PageElement {
     func getXCUIWindow(forAction action: String) -> XCUIElement? {
         handleInterruptions()
 
+        getPage()?.refreshElementCache()
         guard let cacheEntry = elementPathCache[elementIdentifier] else {
             assertionFailure("\(action) called before page.exists()!")
             return nil
         }
-        cacheEntry.page.refreshElementCache()
-        guard let location = cacheEntry.location else {
+        guard let snapshot = cacheEntry.snapshot else {
             assertionFailure("Try to run \(action) on an element of a non-existing page")
             return nil
         }
-
         let application = cacheEntry.page.xcuiapplication
-        guard
-            let windowIndex = location.path.firstIndex(where: { $0.elementType == .window })
-        else {
-            return nil
-        }
-        let query = application.query(path: Array(location.path[0...windowIndex]))
+        let query = application.windows.containing(NSPredicate(snapshot: snapshot))
 
-        return query.element.firstMatch
+        return query.firstMatch
     }
 
     private func getPage() -> Page? {
@@ -67,37 +61,9 @@ extension PageElement {
         return cacheEntry.page
     }
 
-    func getAllXCUIElements(forAction action: String) -> XCUIElementQuery? {
-        handleInterruptions()
-
-        guard let cacheEntry = elementPathCache[elementIdentifier] else {
-            assertionFailure("\(action) called before page.exists()!")
-            return nil
-        }
-        cacheEntry.page.refreshElementCache()
-        guard let location = cacheEntry.location else {
-            assertionFailure("Try to run \(action) on an element of a non-existing page")
-            return nil
-        }
-
-        let application = cacheEntry.page.xcuiapplication
-
-        return application.query(path: location.path)
-    }
-
     /// Sends a tap event to a hittable point the system computes for the element.
     public func tap() {
         guard let element = getXCUIElement(forAction: "tap()") else { return }
-        element.waitUntilStablePosition()
-        element.tap()
-    }
-
-    public func tapAny() {
-        // TODO: It's worth thinking about to merge ``tapAny()`` and ``tap()``.
-        //   This method selects the first element and it's not possible to tap another occurrence of the element.
-        //   In the end, ``tap()`` also taps the first occurrence with the difference that the tests fail if there are
-        //   multiple elements. We could refactor `tap()` to handle multiple occurrences.
-        guard let element = getAllXCUIElements(forAction: "tap()")?.firstMatch else { return }
         element.waitUntilStablePosition()
         element.tap()
     }
@@ -235,27 +201,6 @@ public enum ScrollDirection {
     case up
     case left
     case right
-}
-
-
-// Needed hack because `XCUIApplication` doesn't conform to `XCUIElementQuery`.
-protocol ChildrenQueryProvider {
-    func descendants(matching: XCUIElement.ElementType) -> XCUIElementQuery
-}
-
-extension XCUIApplication: ChildrenQueryProvider {}
-extension XCUIElementQuery: ChildrenQueryProvider {}
-
-
-extension XCUIApplication {
-    func query(path: [Snapshot.PathStep]) -> XCUIElementQuery {
-        var usedQuery: ChildrenQueryProvider = self
-        for step in path[1...] { // First step is always the application itself, so we skip it.
-            usedQuery = usedQuery.descendants(matching: step.elementType).matching(NSPredicate(step: step))
-        }
-
-        return usedQuery as! XCUIElementQuery
-    }
 }
 
 

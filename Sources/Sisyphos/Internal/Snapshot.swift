@@ -3,41 +3,37 @@ import XCTest
 
 struct Snapshot {
     let index: UInt
-    let path: [PathStep]
     let snapshotIdentifier = UUID()
-    let elementType: XCUIElement.ElementType
-    let identifier: String
-    let label: String
-    let value: String?
+    let xcuisnapshot: XCUIElementSnapshot
+
+    var elementType: XCUIElement.ElementType {
+        xcuisnapshot.elementType
+    }
+    var identifier: String {
+        xcuisnapshot.identifier
+    }
+    var label: String {
+        xcuisnapshot.label
+    }
+    var value: String? {
+        xcuisnapshot.value as? String
+    }
 
     let children: [Snapshot]
 
-    private init(xcuisnapshot: XCUIElementSnapshot, counter: Counter, pathSoFar: [PathStep]) {
-        let pathToElement = pathSoFar + [
-            PathStep(
-                elementType: xcuisnapshot.elementType,
-                identifier: xcuisnapshot.identifier,
-                label: xcuisnapshot.label,
-                value: xcuisnapshot.value as? String
-            )
-        ]
+    private init(xcuisnapshot: XCUIElementSnapshot, counter: Counter) {
         index = counter.next()
-        path = pathToElement
-        elementType = xcuisnapshot.elementType
-        identifier = xcuisnapshot.identifier
-        label = xcuisnapshot.label
-        value = xcuisnapshot.value as? String
+        self.xcuisnapshot = xcuisnapshot
         children = xcuisnapshot.children.map { child in
             Snapshot(
                 xcuisnapshot: child,
-                counter: counter,
-                pathSoFar: pathToElement
+                counter: counter
             )
         }
     }
 
     init(xcuisnapshot: XCUIElementSnapshot) {
-        self.init(xcuisnapshot: xcuisnapshot, counter: Counter(), pathSoFar: [])
+        self.init(xcuisnapshot: xcuisnapshot, counter: Counter())
     }
 
     /// IMPORTANT: Doesn't check the children. Only checks the attributes on the element itself.
@@ -55,17 +51,10 @@ struct Snapshot {
 
         return true
     }
-
-    struct PathStep: Equatable {
-        let elementType: XCUIElement.ElementType
-        let identifier: String
-        let label: String
-        let value: String?
-    }
 }
 
 
-private class Counter {
+private final class Counter {
     private var count: UInt = 0
 
     func next() -> UInt {

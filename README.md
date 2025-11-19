@@ -1,19 +1,19 @@
 # Sisyphos - Declarative end-to-end and UI testing for iOS and macOS
 
-![](https://img.shields.io/badge/platform-iOS%20%7C%20macOS-lightgrey)
-![](https://img.shields.io/badge/Swift-5.7%20|%205.6%20|%205.7%20|%205.8%20|%205.9-brightgreen)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FSisyphosTests%2FSisyphos%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/SisyphosTests/Sisyphos)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FSisyphosTests%2FSisyphos%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/SisyphosTests/Sisyphos)
 
-Sisyphos uses a declarative syntax, 
-so you can simply state how the user interface of your app under test should look like. 
+Sisyphos uses a declarative syntax,
+so you can simply state how the user interface of your app under test should look like.
 Your code is simpler and easier to read than ever before, saving you time and maintenance.
 
-There's no need for manually tweaking sleeps or timeouts. 
+There's no need for manually tweaking sleeps or timeouts.
 And no need to write imperative code to wait for elements to appear.
 Your tests will wait automatically exactly as long as needed to have all elements on the screen.
 As soon as the elements appear, the tests will interact with them and continue.
 
 Sisyphos builds on top of Apple's [XCTest framework](https://developer.apple.com/documentation/xctest/user_interface_tests).
-Therefore, no extra software or tooling is needed and the risk of breaking with new Xcode or 
+Therefore, no extra software or tooling is needed and the risk of breaking with new Xcode or
 Swift versions is limited.
 
 ## Example
@@ -102,7 +102,7 @@ for further reference on how to write tests with Sisyphos.
 
 ## Code generation
 
-Instead of building the descriptions of the screens yourself, Sisyphos can automatically generate the code for you. 
+Instead of building the descriptions of the screens yourself, Sisyphos can automatically generate the code for you.
 Call `startCodeGeneration()` inside of an `XCTestCase`. Sisyphos will then record any new screen
 which will appear and add the screens' source code at the end of the file while you manually browse through the app.
 
@@ -110,12 +110,12 @@ which will appear and add the screens' source code at the end of the file while 
 
 ## Integrating Sisyphos to your project
 
-Sisyphos is distributed via the [Swift Package Manager](https://www.swift.org/getting-started/#using-the-package-manager) 
+Sisyphos is distributed via the [Swift Package Manager](https://www.swift.org/getting-started/#using-the-package-manager)
 with the repository URL `https://github.com/SisyphosTests/sisyphos`.
 
 Please refer to [Apple's documentation](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app)
 on how to add a Swift package dependency to your app.
 
-⚠️ Please make sure to add the `Sisyphos` library to your app's UI test target, not the app target itself! If you see 
-errors such as the errors below when building the app, then you added the Sisyphos library to the wrong target. 
+⚠️ Please make sure to add the `Sisyphos` library to your app's UI test target, not the app target itself! If you see
+errors such as the errors below when building the app, then you added the Sisyphos library to the wrong target.
 <img src="./Sources/Sisyphos/Documentation.docc/Resources/integration-wrong-target~dark.png">

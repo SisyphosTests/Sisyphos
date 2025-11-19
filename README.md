@@ -97,8 +97,8 @@ struct SilverSalmonCreekPage: Page {
 }
 ```
 
-Please see [Sisyphos' documentation](https://sisyphostests.github.io/documentation/sisyphos/) for further reference on
-how to write tests with Sisyphos.
+Please see [Sisyphos' documentation](https://swiftpackageindex.com/SisyphosTests/Sisyphos/main/documentation/sisyphos/)
+for further reference on how to write tests with Sisyphos.
 
 ## Code generation
 

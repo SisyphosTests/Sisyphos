@@ -340,6 +340,21 @@ collect(fileName: "/SisyphosTests/TestDataTests.swift", line: 26) {
             SwiftUI.Button("Buy now for 7.77 EUR", action: {})
         
 }
+collect(fileName: "/SisyphosTests/TestDataTests.swift", line: 44) {
+    
+            Text("Order: 3 items for 9.99 EUR")
+        
+}
+collect(fileName: "/SisyphosTests/TestDataTests.swift", line: 64) {
+    
+            Text("Ship Red-42 to Mars")
+        
+}
+collect(fileName: "/SisyphosTests/TestDataTests.swift", line: 86) {
+    
+            Text("Hello World")
+        
+}
 collect(fileName: "/SisyphosTests/TextFieldTests.swift", line: 9) {
     
             SwiftUI.TextField("Enter text", text: appValueBinding())

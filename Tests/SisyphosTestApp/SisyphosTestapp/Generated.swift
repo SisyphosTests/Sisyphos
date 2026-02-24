@@ -318,6 +318,18 @@ collect(fileName: "/SisyphosTests/PageExistsErrorTests.swift", line: 24) {
             Text("Text")
         
 }
+collect(fileName: "/SisyphosTests/ScrollTests.swift", line: 8) {
+    
+            ScrollView {
+                VStack(spacing: 0) {
+                    ForEach(1..<50, id: \.self) { number in
+                        Text("Item \(number)")
+                            .frame(maxWidth: .infinity, minHeight: 100)
+                    }
+                }
+            }
+        
+}
 collect(fileName: "/SisyphosTests/TestDataTests.swift", line: 8) {
     
             Text("Test: Some Value")

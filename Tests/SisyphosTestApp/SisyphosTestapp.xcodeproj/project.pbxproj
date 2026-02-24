@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8081CC5A2F4E45C100A5861C /* ScrollTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8081CC592F4E45C100A5861C /* ScrollTests.swift */; };
 		8C0431E42AC36F2700727A89 /* InterruptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C0431E32AC36F2700727A89 /* InterruptionTests.swift */; };
 		8C1404352AC1AD5A0064343C /* PageExistsErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1404342AC1AD5A0064343C /* PageExistsErrorTests.swift */; };
 		8C19AF732AC9B7F800414A52 /* SwitchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C19AF722AC9B7F800414A52 /* SwitchTests.swift */; };
@@ -43,6 +44,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8081CC592F4E45C100A5861C /* ScrollTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollTests.swift; sourceTree = "<group>"; };
 		8C0431E32AC36F2700727A89 /* InterruptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterruptionTests.swift; sourceTree = "<group>"; };
 		8C1404342AC1AD5A0064343C /* PageExistsErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageExistsErrorTests.swift; sourceTree = "<group>"; };
 		8C19AF722AC9B7F800414A52 /* SwitchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchTests.swift; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 				8C0431E32AC36F2700727A89 /* InterruptionTests.swift */,
 				8C19AF742AC9C02000414A52 /* TestDataTests.swift */,
 				C31078B62AE0414200312CD6 /* OtherTests.swift */,
+				8081CC592F4E45C100A5861C /* ScrollTests.swift */,
 			);
 			path = SisyphosTests;
 			sourceTree = "<group>";
@@ -317,6 +320,7 @@
 				8C19AF792AC9F9FA00414A52 /* NavigationBarTests.swift in Sources */,
 				8C5580BD2AC1694B00222860 /* ButtonTests.swift in Sources */,
 				8C6D0E5F2AB1F17B00353087 /* TabBarTests.swift in Sources */,
+				8081CC5A2F4E45C100A5861C /* ScrollTests.swift in Sources */,
 				8C6BEDF92AC0C8DD00D4B0CD /* XCTestCase+LaunchApp.swift in Sources */,
 				8C1404352AC1AD5A0064343C /* PageExistsErrorTests.swift in Sources */,
 				8C19AF7D2ACA09F700414A52 /* StaticTextTests.swift in Sources */,

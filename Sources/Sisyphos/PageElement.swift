@@ -162,7 +162,7 @@ extension PageElement {
         guard let window = getXCUIWindow(forAction: "scroll until visible") else { return }
         guard !CGRectContainsRect(window.frame, element.frame) else { return }
         var tryCounter = maxTryCount
-        var startCoordinate = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        let startCoordinate = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
         repeat {
             var endCoordinate = startCoordinate
             switch direction {
@@ -181,7 +181,6 @@ extension PageElement {
             }
             element.waitUntilStablePosition()
             tryCounter -= 1
-            startCoordinate = endCoordinate
             guard !CGRectContainsRect(window.frame, element.frame) else { return }
         } while tryCounter > 0
 

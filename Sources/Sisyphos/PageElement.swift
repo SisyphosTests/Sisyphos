@@ -218,7 +218,7 @@ extension String {
         }
 
         let variables: [UUID] = variableMatches.compactMap { match -> UUID? in
-            guard let range = Range(NSRange(location: match.range.location + 1, length: match.range.length - 2), in: searchedLabel) else { return nil }
+            guard let range = Range(match.range(at: 1), in: searchedLabel) else { return nil }
             return UUID(uuidString: String(searchedLabel[range]))
         }
 
@@ -231,10 +231,10 @@ extension String {
             return false
         }
         let valueMatches = regex.matches(in: self, range: NSRange(location: 0, length: utf16.count))
-        for (index, match) in valueMatches.enumerated() {
-            guard let range = Range(match.range(at: 1), in: self) else { continue }
-            let value = self[range]
-            TestData[variables[index]] = String(value)
+        guard let match = valueMatches.first else { return false }
+        for (index, variable) in variables.enumerated() {
+            guard let range = Range(match.range(at: index + 1), in: self) else { continue }
+            TestData[variable] = String(self[range])
         }
 
         return true

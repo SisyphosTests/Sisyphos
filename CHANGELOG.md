@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   because the scroll origin kept shifting with each attempt.
   Now scrolling reliably starts from the center of the screen every time.
 - Fixes running the unit tests on macOS.
+- Fixes text extraction to correctly capture multiple variable values from a single label.
 
 ## [0.1.0] - 2025-11-19
 

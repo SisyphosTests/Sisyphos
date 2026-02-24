@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixes an issue where scrolling to find an element on screen didn't work correctly
+  because the scroll origin kept shifting with each attempt.
+  Now scrolling reliably starts from the center of the screen every time.
+
 ## [0.1.0] - 2025-11-19
 
 ### Added

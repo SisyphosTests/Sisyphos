@@ -30,8 +30,8 @@ private class FakeSnapshot: XCUIElementSnapshot {
     var label: String = "expected label"
     var elementType: XCUIElement.ElementType = .alert
     var isEnabled: Bool = false
-    var horizontalSizeClass: XCUIElement.SizeClass = .compact
-    var verticalSizeClass: XCUIElement.SizeClass = .compact
+    var horizontalSizeClass: XCUIElement.SizeClass = .unspecified
+    var verticalSizeClass: XCUIElement.SizeClass = .unspecified
     var placeholderValue: String? = nil
     var isSelected: Bool = false
     var hasFocus: Bool = false

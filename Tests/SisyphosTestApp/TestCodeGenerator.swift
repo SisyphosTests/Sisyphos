@@ -94,7 +94,7 @@ struct Parser {
 
     init(fileUrl: URL) {
         self.fileUrl = fileUrl
-        let fileContents = try! String(String(contentsOf: fileUrl))
+        let fileContents = try! String(String(contentsOf: fileUrl, encoding: .utf8))
         self.reader = Scanner(contents: fileContents)
     }
 

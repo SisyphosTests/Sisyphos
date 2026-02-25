@@ -42,8 +42,10 @@ extension XCTestCase {
             let sourceWithoutUniqueName = page.generatePageSource(pageName: identifier, applicationName: application)
             guard lastSource != sourceWithoutUniqueName else { continue }
             lastSource = sourceWithoutUniqueName
+            let pageName = identifier.generatePageName()
+            let source = page.generatePageSource(pageName: pageName, applicationName: application)
             appendToSourceFile(
-                addedContents: sourceWithoutUniqueName + "\n\n"
+                addedContents: source + "\n\n"
             )
         }
     }

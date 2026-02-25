@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Now scrolling reliably starts from the center of the screen every time.
 - Fixes running the unit tests on macOS.
 - Fixes text extraction to correctly capture multiple variable values from a single label.
+- When staying on the same screen while it changes,
+  the code generation now produces unique page names
+  (e.g. Settings, Settings2, Settings3)
+  instead of reusing the same name each time.
 
 ## [0.1.0] - 2025-11-19
 

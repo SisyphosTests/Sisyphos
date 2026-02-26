@@ -106,6 +106,12 @@ Instead of building the descriptions of the screens yourself, Sisyphos can autom
 Call `startCodeGeneration()` inside of an `XCTestCase`. Sisyphos will then record any new screen
 which will appear and add the screens' source code at the end of the file while you manually browse through the app.
 
+If your test flow spans multiple apps, you can pass several bundle identifiers to monitor them all in a single session:
+
+```swift
+startCodeGeneration(applications: ["com.example.myapp", "com.apple.Preferences"])
+```
+
 ![](./Sources/Sisyphos/Documentation.docc/Resources/codegeneration.gif)
 
 ## Integrating Sisyphos to your project

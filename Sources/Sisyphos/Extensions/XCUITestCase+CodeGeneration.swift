@@ -7,7 +7,31 @@ extension XCTestCase {
         file: String = #file,
         line: UInt = #line
     ) {
+        if let application {
+            _startCodeGeneration(apps: [(XCUIApplication(bundleIdentifier: application), application)], file: file, line: line)
+        } else {
+            _startCodeGeneration(apps: [(XCUIApplication(), nil)], file: file, line: line)
+        }
+    }
 
+    public func startCodeGeneration(
+        applications: [String],
+        file: String = #file,
+        line: UInt = #line
+    ) {
+        guard !applications.isEmpty else {
+            XCTFail("startCodeGeneration(applications:) requires at least one bundle identifier.")
+            return
+        }
+        let apps = applications.map { (XCUIApplication(bundleIdentifier: $0), $0) }
+        _startCodeGeneration(apps: apps, file: file, line: line)
+    }
+
+    private func _startCodeGeneration(
+        apps: [(app: XCUIApplication, applicationName: String?)],
+        file: String,
+        line: UInt
+    ) {
         #if !targetEnvironment(simulator)
         print("⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️")
         print("⚠️ You are running the code generation on a real device 📱")
@@ -23,30 +47,24 @@ extension XCTestCase {
             try? (contents + addedContents).write(to: fileUrl, atomically: true, encoding: .utf8)
         }
 
-        let app: XCUIApplication
-        if let application {
-            app = XCUIApplication(bundleIdentifier: application)
-        } else {
-            app = XCUIApplication()
-        }
+        var lastSources = [Int: String]()
 
-        var lastSource = ""
         while true {
             RunLoop.current.run(until: Date(timeIntervalSinceNow: 1))
-            guard
-                let snapshot = try? app.snapshot(),
-                let page = app.currentPage
-            else { continue }
+            for (index, (app, applicationName)) in apps.enumerated() {
+                guard
+                    let snapshot = try? app.snapshot(),
+                    let page = app.currentPage
+                else { continue }
 
-            let identifier = snapshot.findFirstIdentifier() ?? "GeneratedPage"
-            let sourceWithoutUniqueName = page.generatePageSource(pageName: identifier, applicationName: application)
-            guard lastSource != sourceWithoutUniqueName else { continue }
-            lastSource = sourceWithoutUniqueName
-            let pageName = identifier.generatePageName()
-            let source = page.generatePageSource(pageName: pageName, applicationName: application)
-            appendToSourceFile(
-                addedContents: source + "\n\n"
-            )
+                let identifier = snapshot.findFirstIdentifier() ?? "GeneratedPage"
+                let sourceForComparison = page.generatePageSource(pageName: identifier, applicationName: applicationName)
+                guard lastSources[index] != sourceForComparison else { continue }
+                lastSources[index] = sourceForComparison
+                let pageName = identifier.generatePageName()
+                let source = page.generatePageSource(pageName: pageName, applicationName: applicationName)
+                appendToSourceFile(addedContents: source + "\n\n")
+            }
         }
     }
 }

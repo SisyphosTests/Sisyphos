@@ -181,7 +181,7 @@ class UITests: XCTestCase {
     func testNew() {
         let app = XCUIApplication()
         app.launch()
-        
+
         startCodeGeneration()
     }
 
@@ -190,8 +190,30 @@ class UITests: XCTestCase {
 
 ![](codegeneration)
 
+### Generating pages for a specific app
 
-> Info: The Code generation will add the generated code at the end of the file from which you call 
+If you want to generate pages for an app other than the test target, pass its bundle identifier:
+
+```swift
+startCodeGeneration(application: "com.apple.Preferences")
+```
+
+### Generating pages for multiple apps
+
+If your test flow spans multiple apps (e.g. your main app and Settings), you can monitor them
+all in a single code generation session:
+
+```swift
+startCodeGeneration(applications: [
+    "com.example.myapp",
+    "com.apple.Preferences"
+])
+```
+
+Sisyphos will watch every app on each cycle and generate a page whenever any of them displays
+a new screen. Page names are kept unique across all apps.
+
+> Info: The Code generation will add the generated code at the end of the file from which you call
 > `startCodeGeneration()`. This will only work when running the code generation on a simulator.
 > When running on a real device, the code generation cannot access the source file.
 

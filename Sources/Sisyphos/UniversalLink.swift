@@ -63,15 +63,25 @@ private func openUniversalLinkIOS26(
     line: UInt
 ) {
     // iOS 26 Safari uses a CapsuleViewController whose URL bar is a text field with
-    // the identifier "TabBarItemTitle".
-    let urlTextField = safari.textFields["TabBarItemTitle"]
+    // the identifier "TabBarItemTitle". A keyboard from a previously loaded page can hide it,
+    // so we dismiss the keyboard on each attempt.
+    let tabBarItemTitle = safari.textFields["TabBarItemTitle"]
 
-    guard urlTextField.waitForExistence(timeout: timeout) else {
+    let deadline = Date(timeIntervalSinceNow: timeout)
+    var foundAddressBar = false
+    repeat {
+        safari.dismissKeyboard()
+        if tabBarItemTitle.waitForExistence(timeout: 1) {
+            tabBarItemTitle.tap()
+            foundAddressBar = true
+            break
+        }
+    } while Date() < deadline
+
+    guard foundAddressBar else {
         XCTFail("Safari's address bar (TabBarItemTitle) did not appear within \(timeout)s", file: file, line: line)
         return
     }
-
-    urlTextField.tap()
 
     // After tapping TabBarItemTitle the screen changes and the actual editable URL bar
     // becomes a text field with the identifier "URL".
@@ -116,13 +126,15 @@ private func openUniversalLinkLegacy(
     line: UInt
 ) {
     // Safari's address bar appears as a button when a page is loaded, or as a text field when
-    // focused/empty. We need to handle both states.
+    // focused/empty. We need to handle both states. A keyboard from a previously loaded page can
+    // hide the URL bar, so we dismiss the keyboard on each attempt.
     let urlButton = safari.buttons["URL"]
     let urlTextField = safari.textFields["URL"]
 
     let deadline = Date(timeIntervalSinceNow: timeout)
     var foundAddressBar = false
     repeat {
+        safari.dismissKeyboard()
         if urlButton.waitForExistence(timeout: 1) {
             urlButton.tap()
             foundAddressBar = true

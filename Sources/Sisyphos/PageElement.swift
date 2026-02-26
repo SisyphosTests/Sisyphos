@@ -101,27 +101,11 @@ extension PageElement {
             element.typeText(text)
 
             guard dismissKeyboard else { return }
-
-            guard let dismissButton = getPage()?.xcuiapplication.keyboards.buttons["Done".localizedForSimulator] else {
+            guard let application = getPage()?.xcuiapplication else {
+                assertionFailure()
                 return
             }
-            guard dismissButton.exists else { return }
-            // If this is a fresh simulator - which is very common on CI systems - then there's an overlay over the
-            // keyboard which explains how to use the swipe keyboard. All of the buttons of the keyboard and its
-            // toolbar are visible for the automation, but not tappable. We first need to dismiss the overlay.
-            // Unfortunately this overlay is not part of the keyboard, so querying it via application.keyboards... will
-            // not work. It doesn't have an accessibility identifier neither.
-            if !dismissButton.isHittable {
-                guard let app = getPage()?.xcuiapplication else { return }
-                for button in app.buttons.matching(identifier: "Continue".localizedForSimulator).allElementsBoundByIndex {
-                    guard button.isHittable else { continue }
-                    button.tap()
-                    break
-                }
-            }
-            if dismissButton.isHittable {
-                dismissButton.tap()
-            }
+            application.dismissKeyboard()
         }
     }
 

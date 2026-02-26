@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Universal link testing support via `open(universalLink:)`.
+
 ### Fixed
 
 - Fixes an issue where scrolling to find an element on screen didn't work correctly

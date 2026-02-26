@@ -6,6 +6,12 @@ public struct Alert: PageElement, HasChildren {
 
     public let elements: [PageElement]
 
+    init(identifier: String?, elements: [PageElement]) {
+        self.elementIdentifier = .dynamic
+        self.identifier = identifier
+        self.elements = elements
+    }
+
     public init(
         identifier: String? = nil,
         @PageBuilder children: () -> PageDescription,

@@ -53,7 +53,7 @@ extension PageElement {
         return query.firstMatch
     }
 
-    private func getPage() -> Page? {
+    func getPage() -> Page? {
         guard let cacheEntry = elementPathCache[elementIdentifier] else {
             return nil
         }

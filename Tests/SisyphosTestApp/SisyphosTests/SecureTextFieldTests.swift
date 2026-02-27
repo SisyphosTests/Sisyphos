@@ -32,4 +32,61 @@ final class SecureTextFieldTests: XCTestCase {
         let expectedPage = ExpectedPage()
         expectedPage.waitForExistence()
     }
+
+    func testSecureTextFieldInteractionTypeText() {
+        let app = launchTestApp {
+            SecureField("Enter password", text: appValueBinding())
+        }
+
+        struct ExpectedPage: Page {
+            let secureTextField = SecureTextField()
+
+            var body: PageDescription {
+                secureTextField
+            }
+        }
+        let expectedPage = ExpectedPage()
+        expectedPage.waitForExistence()
+        expectedPage.secureTextField.type(text: "Secret123")
+
+        XCTAssertEqual(app.label, "Secret123")
+    }
+
+    func testSecureTextFieldStillFoundAfterTyping() {
+        launchTestApp {
+            SecureField("Enter password", text: appValueBinding())
+        }
+
+        struct ExpectedPage: Page {
+            let secureTextField = SecureTextField()
+
+            var body: PageDescription {
+                secureTextField
+            }
+        }
+        let expectedPage = ExpectedPage()
+        expectedPage.waitForExistence()
+        expectedPage.secureTextField.type(text: "Secret123")
+        expectedPage.waitForExistence()
+    }
+
+    func testSecureTextFieldInteractionTap() {
+        let app = launchTestApp {
+            SecureField("Enter password", text: appValueBinding())
+        }
+
+        struct ExpectedPage: Page {
+            let secureTextField = SecureTextField()
+
+            var body: PageDescription {
+                secureTextField
+            }
+        }
+        let expectedPage = ExpectedPage()
+        expectedPage.waitForExistence()
+
+        XCTAssertFalse(app.secureTextFields.firstMatch.hasKeyboardFocus)
+        expectedPage.secureTextField.tap()
+        XCTAssertTrue(app.secureTextFields.firstMatch.hasKeyboardFocus)
+    }
 }

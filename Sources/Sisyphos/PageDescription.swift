@@ -29,9 +29,19 @@ private extension PageElement {
         let indentationString = String(repeating: "  ", count: indentation)
         var output = "\(indentationString)\(String(describing: Swift.type(of: self)))"
         var properties: [(propertyName: String, value: String)] = Mirror(reflecting: self).children.compactMap { (property, value) in
-            guard let property else { return nil }
+            guard var property else { return nil }
+
+            // Property wrappers are stored as _name with the wrapper as the value
+            var resolvedValue: Any = value
+            if property.hasPrefix("_") {
+                property = String(property.dropFirst())
+                if let wrapped = Mirror(reflecting: value).descendant("wrappedValue") {
+                    resolvedValue = wrapped
+                }
+            }
+
             guard !["elementIdentifier", "elements"].contains(property) else { return nil }
-            guard let stringValue = value as? String, !stringValue.isEmpty else { return nil }
+            guard let stringValue = resolvedValue as? String, !stringValue.isEmpty else { return nil }
 
             return (
                 propertyName: property,

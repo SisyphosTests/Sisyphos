@@ -205,6 +205,21 @@ collect(fileName: "/SisyphosTests/SecureTextFieldTests.swift", line: 22) {
                 .accessibilityIdentifier("the_securefield")
         
 }
+collect(fileName: "/SisyphosTests/SecureTextFieldTests.swift", line: 37) {
+    
+            SecureField("Enter password", text: appValueBinding())
+        
+}
+collect(fileName: "/SisyphosTests/SecureTextFieldTests.swift", line: 56) {
+    
+            SecureField("Enter password", text: appValueBinding())
+        
+}
+collect(fileName: "/SisyphosTests/SecureTextFieldTests.swift", line: 74) {
+    
+            SecureField("Enter password", text: appValueBinding())
+        
+}
 collect(fileName: "/SisyphosTests/InterruptionTests.swift", line: 17) {
     
             Button(action: {
@@ -406,6 +421,11 @@ collect(fileName: "/SisyphosTests/TextFieldTests.swift", line: 56) {
         
 }
 collect(fileName: "/SisyphosTests/TextFieldTests.swift", line: 76) {
+    
+            SwiftUI.TextField("Enter text", text: appValueBinding())
+        
+}
+collect(fileName: "/SisyphosTests/TextFieldTests.swift", line: 94) {
     
             SwiftUI.TextField("Enter text", text: appValueBinding())
         

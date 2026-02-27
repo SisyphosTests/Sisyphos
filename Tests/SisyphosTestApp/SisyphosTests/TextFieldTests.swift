@@ -72,6 +72,24 @@ final class TextFieldTests: XCTestCase {
         XCTAssertEqual(app.textFields.firstMatch.value as? String, "Hello from test")
     }
 
+    func testTextFieldStillFoundAfterTyping() {
+        launchTestApp {
+            SwiftUI.TextField("Enter text", text: appValueBinding())
+        }
+
+        struct ExpectedPage: Page {
+            let textField = Sisyphos.TextField()
+
+            var body: PageDescription {
+                textField
+            }
+        }
+        let expectedPage = ExpectedPage()
+        expectedPage.waitForExistence()
+        expectedPage.textField.type(text: "Updated value")
+        expectedPage.waitForExistence()
+    }
+
     func testTextFieldInteractionTap() {
         let app = launchTestApp {
             SwiftUI.TextField("Enter text", text: appValueBinding())

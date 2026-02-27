@@ -56,13 +56,15 @@ public extension Page {
             screenshotAttachment.lifetime = .deleteOnSuccess
             activity.add(screenshotAttachment)
 
+            let queryWebViewSnapshots = snapshotQueryWebViews()
             guard let snapshot = try? xcuiapplication.snapshot() else {
                 return PageExistsResults(
                     missingElements: body.elements,
                     actualPage: nil
                 )
             }
-            let finder = ElementFinder(page: self, snapshot: snapshot)
+            let additionalWebViews = outOfProcessWebViewSnapshots(appSnapshot: snapshot, queryWebViewSnapshots: queryWebViewSnapshots)
+            let finder = ElementFinder(page: self, snapshot: snapshot, additionalWebViews: additionalWebViews)
             TestData.isEvaluatingBody = true
             defer {
                 TestData.isEvaluatingBody = false
@@ -133,11 +135,53 @@ public extension Page {
 
 extension Page {
     func refreshElementCache() {
+        let queryWebViewSnapshots = snapshotQueryWebViews()
         guard let snapshot = try? xcuiapplication.snapshot() else {
             return
         }
-        let finder = ElementFinder(page: self, snapshot: snapshot)
+        let additionalWebViews = outOfProcessWebViewSnapshots(appSnapshot: snapshot, queryWebViewSnapshots: queryWebViewSnapshots)
+        let finder = ElementFinder(page: self, snapshot: snapshot, additionalWebViews: additionalWebViews)
         _ = finder.check()
+    }
+}
+
+extension Page {
+    /// Snapshots all web views found via `xcuiapplication.webViews` query upfront.
+    /// Called *before* `xcuiapplication.snapshot()` so that both snapshots are taken as close together
+    /// as possible, minimizing the window for accessibility tree changes between them.
+    func snapshotQueryWebViews() -> [XCUIElementSnapshot] {
+        xcuiapplication.webViews.allElementsBoundByIndex.compactMap { try? $0.snapshot() }
+    }
+
+    /// Identifies out-of-process web views by comparing pre-collected query-based web view snapshots
+    /// against web views found in the app's snapshot tree. Web views present in the query but not
+    /// matched in the snapshot tree are out-of-process (e.g. SFSafariViewController,
+    /// ASWebAuthenticationSession).
+    func outOfProcessWebViewSnapshots(
+        appSnapshot: XCUIElementSnapshot,
+        queryWebViewSnapshots: [XCUIElementSnapshot]
+    ) -> [XCUIElementSnapshot] {
+        guard !queryWebViewSnapshots.isEmpty else { return [] }
+
+        let snapshotWebViews = collectWebViewSnapshots(from: appSnapshot)
+
+        return queryWebViewSnapshots.filter { querySnapshot in
+            let isInSnapshot = snapshotWebViews.contains {
+                $0.matches(snapshot: querySnapshot)
+            }
+            return !isInSnapshot
+        }
+    }
+
+    private func collectWebViewSnapshots(from snapshot: XCUIElementSnapshot) -> [XCUIElementSnapshot] {
+        var result: [XCUIElementSnapshot] = []
+        if snapshot.elementType == .webView {
+            result.append(snapshot)
+        }
+        for child in snapshot.children {
+            result.append(contentsOf: collectWebViewSnapshots(from: child))
+        }
+        return result
     }
 }
 

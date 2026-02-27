@@ -4,25 +4,49 @@ import XCTest
 final class ElementFinder {
     let snapshot: Snapshot
     let page: Page
+    let additionalWebViewSnapshots: [Snapshot]
 
-    init(page: Page, snapshot: XCUIElementSnapshot) {
+    init(page: Page, snapshot: XCUIElementSnapshot, additionalWebViews: [XCUIElementSnapshot] = []) {
         self.page = page
         self.snapshot = Snapshot(xcuisnapshot: snapshot)
+        self.additionalWebViewSnapshots = additionalWebViews.map { Snapshot(xcuisnapshot: $0) }
     }
 
+    // Note: The out-of-process web view fallback only applies to top-level WebView elements in
+    // page.body.elements. A WebView nested inside another container (e.g. Cell { WebView { ... } })
+    // won't trigger the fallback — the parent container's find() would fail before we get here.
+    // This is a conceptual idea for a future improvement: the recursive find() could be extended to
+    // attempt the out-of-process fallback when it encounters a .webView descendant that doesn't match
+    // in the main snapshot.
     func check() -> [PageElement] {
         var missingElements: [PageElement] = []
         var indexOfPreviousElement: UInt = 0
+        var usedAdditionalWebViewIDs = Set<UUID>()
         for element in page.body.elements {
             registerElement(element: element)
-            guard let result = find(element: element, after: indexOfPreviousElement, in: snapshot) else {
+            if let result = find(element: element, after: indexOfPreviousElement, in: snapshot) {
+                indexOfPreviousElement = result.index
+            } else if element.queryIdentifier.elementType == .webView,
+                      let match = findInAdditionalWebViews(element: element, excluding: usedAdditionalWebViewIDs) {
+                // Found in out-of-process web views; don't update indexOfPreviousElement
+                // since these aren't part of the main snapshot's index sequence
+                usedAdditionalWebViewIDs.insert(match.snapshotIdentifier)
+            } else {
                 missingElements.append(element)
-                continue
             }
-            indexOfPreviousElement = result.index
         }
 
         return missingElements
+    }
+
+    private func findInAdditionalWebViews(element: PageElement, excluding usedIDs: Set<UUID>) -> Snapshot? {
+        for webViewSnapshot in additionalWebViewSnapshots {
+            guard !usedIDs.contains(webViewSnapshot.snapshotIdentifier) else { continue }
+            if let result = find(element: element, after: 0, in: webViewSnapshot) {
+                return result
+            }
+        }
+        return nil
     }
 
     private func registerElement(element: PageElement) {

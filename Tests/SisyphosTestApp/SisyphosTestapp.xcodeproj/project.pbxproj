@@ -41,6 +41,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Meta/CommonHelpers.swift,
+				Meta/WebViewHelpers.swift,
 			);
 			target = 8C6D0E3F2AB1F17900353087 /* SisyphosTestapp */;
 		};

@@ -61,6 +61,11 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
             identifier: element.identifier,
             value: element.value as? String
         )
+    case .webView:
+        return WebView(
+            identifier: element.identifier.isEmpty ? nil : element.identifier,
+            elements: element.children.flatMap(flatten(element:))
+        )
     // Usually, there are a lot of `Other` elements which produce a lot of visual noise.
     // Because of that, we only include them if they have either a label or an identifier.
     case .other where !element.label.isEmpty || !element.identifier.isEmpty:

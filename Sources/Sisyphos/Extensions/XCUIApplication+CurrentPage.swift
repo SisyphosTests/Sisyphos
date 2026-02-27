@@ -3,8 +3,18 @@ import XCTest
 
 public extension XCUIApplication {
     var currentPage: PageDescription? {
+        let queryWebViewSnapshots = webViews.allElementsBoundByIndex.compactMap { try? $0.snapshot() }
         guard let snapshot = try? snapshot() else { return nil }
-        return snapshot.toPage()
+        var elements = flatten(element: snapshot)
+        for webViewSnapshot in outOfProcessWebViewSnapshots(appSnapshot: snapshot, queryWebViewSnapshots: queryWebViewSnapshots) {
+            elements.append(
+                WebView(
+                    identifier: webViewSnapshot.identifier.isEmpty ? nil : webViewSnapshot.identifier,
+                    elements: webViewSnapshot.children.flatMap(flatten(element:))
+                )
+            )
+        }
+        return PageDescription(elements: elements)
     }
 }
 

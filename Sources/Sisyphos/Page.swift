@@ -152,37 +152,38 @@ extension Page {
     func snapshotQueryWebViews() -> [XCUIElementSnapshot] {
         xcuiapplication.webViews.allElementsBoundByIndex.compactMap { try? $0.snapshot() }
     }
+}
 
-    /// Identifies out-of-process web views by comparing pre-collected query-based web view snapshots
-    /// against web views found in the app's snapshot tree. Web views present in the query but not
-    /// matched in the snapshot tree are out-of-process (e.g. SFSafariViewController,
-    /// ASWebAuthenticationSession).
-    func outOfProcessWebViewSnapshots(
-        appSnapshot: XCUIElementSnapshot,
-        queryWebViewSnapshots: [XCUIElementSnapshot]
-    ) -> [XCUIElementSnapshot] {
-        guard !queryWebViewSnapshots.isEmpty else { return [] }
 
-        let snapshotWebViews = collectWebViewSnapshots(from: appSnapshot)
+/// Identifies out-of-process web views by comparing pre-collected query-based web view snapshots
+/// against web views found in the app's snapshot tree. Web views present in the query but not
+/// matched in the snapshot tree are out-of-process (e.g. SFSafariViewController,
+/// ASWebAuthenticationSession).
+func outOfProcessWebViewSnapshots(
+    appSnapshot: XCUIElementSnapshot,
+    queryWebViewSnapshots: [XCUIElementSnapshot]
+) -> [XCUIElementSnapshot] {
+    guard !queryWebViewSnapshots.isEmpty else { return [] }
 
-        return queryWebViewSnapshots.filter { querySnapshot in
-            let isInSnapshot = snapshotWebViews.contains {
-                $0.matches(snapshot: querySnapshot)
-            }
-            return !isInSnapshot
+    let snapshotWebViews = collectWebViewSnapshots(from: appSnapshot)
+
+    return queryWebViewSnapshots.filter { querySnapshot in
+        let isInSnapshot = snapshotWebViews.contains {
+            $0.matches(snapshot: querySnapshot)
         }
+        return !isInSnapshot
     }
+}
 
-    private func collectWebViewSnapshots(from snapshot: XCUIElementSnapshot) -> [XCUIElementSnapshot] {
-        var result: [XCUIElementSnapshot] = []
-        if snapshot.elementType == .webView {
-            result.append(snapshot)
-        }
-        for child in snapshot.children {
-            result.append(contentsOf: collectWebViewSnapshots(from: child))
-        }
-        return result
+private func collectWebViewSnapshots(from snapshot: XCUIElementSnapshot) -> [XCUIElementSnapshot] {
+    var result: [XCUIElementSnapshot] = []
+    if snapshot.elementType == .webView {
+        result.append(snapshot)
     }
+    for child in snapshot.children {
+        result.append(contentsOf: collectWebViewSnapshots(from: child))
+    }
+    return result
 }
 
 var elementPathCache: [PageElementIdentifier: CacheEntry] = [:]

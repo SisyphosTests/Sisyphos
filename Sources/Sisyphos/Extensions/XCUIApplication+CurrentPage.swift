@@ -26,7 +26,7 @@ extension XCUIElementSnapshot {
 }
 
 
-private func extract(element: XCUIElementSnapshot) -> PageElement? {
+func extract(element: XCUIElementSnapshot) -> PageElement? {
     switch element.elementType {
     case .navigationBar:
         return NavigationBar(
@@ -89,7 +89,7 @@ private func extract(element: XCUIElementSnapshot) -> PageElement? {
     }
 }
 
-private func flatten(element: XCUIElementSnapshot) -> [PageElement] {
+func flatten(element: XCUIElementSnapshot) -> [PageElement] {
     if let extracted = extract(element: element) {
         return [extracted]
     }

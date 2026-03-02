@@ -69,9 +69,18 @@ public extension Page {
             defer {
                 TestData.isEvaluatingBody = false
             }
+            var actualPageElements = flatten(element: snapshot)
+            for webViewSnapshot in additionalWebViews {
+                actualPageElements.append(
+                    WebView(
+                        identifier: webViewSnapshot.identifier.isEmpty ? nil : webViewSnapshot.identifier,
+                        elements: webViewSnapshot.children.flatMap(flatten(element:))
+                    )
+                )
+            }
             return PageExistsResults(
                 missingElements: finder.check(),
-                actualPage: snapshot.toPage()
+                actualPage: PageDescription(elements: actualPageElements)
             )
         }
     }

@@ -94,7 +94,7 @@ private func openUniversalLinkIOS26(
     editableURLField.typeText(dataURL + "\n")
 
     let link = safari.links["link"]
-    guard link.waitForExistence(timeout: timeout) else {
+    guard link.wait(for: \.isHittable, toEqual: true, timeout: timeout) else {
         let screenshot = XCTAttachment(screenshot: safari.screenshot())
         screenshot.name = "Safari – universal link not found"
         screenshot.lifetime = .keepAlways
@@ -107,7 +107,9 @@ private func openUniversalLinkIOS26(
         return
     }
 
+    link.waitUntilStablePosition()
     link.tap()
+    _ = RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.5))
     // If this is a fresh simulator, then there can be a popup explaining new Safari features and the first tap
     // dismisses the popup instead of opening the link. We can check because a tap on the link also selects it.
     if !link.isSelected {

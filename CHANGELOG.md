@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- On iOS, you can open universal links with the new `open(universalLink:)` function.
+  It will launch Safari and open the link in a way that triggers the universal link mechanisms, so you can test
+  deep links to your application.
+
 ### Fixed
 
 - Fixes an issue where scrolling to find an element on screen didn't work correctly
